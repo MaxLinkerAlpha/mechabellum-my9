@@ -1,6 +1,13 @@
-# 构成我的九个钢指单位
+# 我最心爱的9个钢指单位
 
 > 钢铁指挥官 (Mechabellum) 玩家单位选择分享工具
+
+## 项目变更记录
+
+### 2026-03-12 清理冗余文件
+- **删除未使用的 shadcn/ui 组件**（51个）：accordion, alert-dialog, alert, aspect-ratio, avatar, badge, breadcrumb, button-group, calendar, card, carousel, chart, checkbox, collapsible, command, context-menu, drawer, dropdown-menu, empty, field, form, hover-card, input-group, input-otp, input, item, kbd, label, menubar, navigation-menu, pagination, popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, sidebar, skeleton, slider, sonner, spinner, switch, table, tabs, textarea, toggle-group, toggle, tooltip
+- **删除未使用的 hook**：use-mobile.ts
+- **保留组件**：button.tsx, dialog.tsx（实际使用）
 
 一个受 [my9](https://github.com/SomiaWhiteRing/my9) 启发的网页应用，让钢铁指挥官玩家可以选择并分享构成自己战术风格的9个单位。
 

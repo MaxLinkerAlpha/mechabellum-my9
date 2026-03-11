@@ -491,14 +491,19 @@ function App() {
                             {unit.comment ? '✎' : <MessageSquarePlus className="w-3.5 h-3.5" />}
                           </button>
                           
-                          {/* 单位图标 - 使用img标签 */}
+                          {/* 单位图标 */}
                           {unit.icon && (
                             <img 
                               src={unit.icon}
                               alt={unit.cn}
-                              className="absolute inset-0 w-full h-full object-contain opacity-50 z-0 p-2"
-                              style={{ transform: 'scale(0.85)' }}
+                              className="absolute inset-0 w-full h-full object-contain z-0"
+                              style={{ 
+                                opacity: 0.8,
+                                transform: 'scale(0.75)',
+                                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
+                              }}
                               onError={(e) => {
+                                console.log('Icon load failed:', unit.icon);
                                 (e.target as HTMLImageElement).style.display = 'none';
                               }}
                             />
@@ -584,8 +589,12 @@ function App() {
                               <img 
                                 src={`${baseUrl}${unit.icon}`}
                                 alt={unit.cn}
-                                className="absolute inset-0 w-full h-full object-contain opacity-50 z-0 p-2"
-                                style={{ top: unit.comment ? '0' : '10px' }}
+                                className="absolute inset-0 w-full h-full object-contain z-0"
+                                style={{ 
+                                  opacity: 0.7,
+                                  transform: 'scale(0.7)',
+                                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
+                                }}
                                 crossOrigin="anonymous"
                               />
                             )}
@@ -622,26 +631,10 @@ function App() {
                   })}
                 </div>
 
-                {/* 简化底部信息 - 只保留网页二维码和链接 */}
-                <div className="mt-8 pt-6 border-t border-[#2c2c36]">
-                  <div className="flex items-center justify-center gap-6">
-                    {/* 左侧二维码 */}
-                    <div className="text-center flex-shrink-0">
-                      <img 
-                        src={`${baseUrl}/qr_codes/website.png`}
-                        alt="QR" 
-                        style={{ width: '80px', height: '80px', borderRadius: '8px' }}
-                        crossOrigin="anonymous"
-                      />
-                      <p className="text-xs text-[#7a7a8c] mt-1">{t.scanToVisit}</p>
-                    </div>
-                    
-                    {/* 中间链接 */}
-                    <div className="text-center">
-                      <p className="text-base text-white mb-1">maxalphalinker.github.io/mechabellum-my9</p>
-                      <p className="text-sm text-[#7a7a8c]">{t.author}</p>
-                    </div>
-                  </div>
+                {/* 底部信息 - 仅文字 */}
+                <div className="mt-8 pt-6 border-t border-[#2c2c36] text-center">
+                  <p className="text-lg text-white mb-2">maxalphalinker.github.io/mechabellum-my9</p>
+                  <p className="text-base text-[#7a7a8c]">{lang === 'zh' ? '将网址输入浏览器地址栏，制作你的钢指Top9' : 'Enter the URL in browser to create your Mecha Top9'}</p>
                 </div>
               </div>
             </div>
