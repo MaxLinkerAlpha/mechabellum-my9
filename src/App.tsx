@@ -42,6 +42,7 @@ const translations = {
 
     generatedBy: 'Max Linker with Kimi',
     switchLang: 'English',
+    community: '社区',
 
     selectedList: '已选单位列表',
     author: 'Max Linker with Kimi',
@@ -73,6 +74,7 @@ const translations = {
 
     generatedBy: 'Max Linker with Kimi',
     switchLang: '中文',
+    community: 'Community',
 
     selectedList: 'Selected Units',
     author: 'Max Linker with Kimi',
@@ -284,9 +286,10 @@ function App() {
               </h1>
               <div className="flex items-center gap-3 mt-1">
                 <p className="text-sm text-[#7a7a8c]">{t.subtitle}</p>
+                <span className="text-xs text-[#5a5a6c]">by {t.author}</span>
                 {/* Visitors 统计 */}
                 <img 
-                  src="https://visitor-badge.glitch.me/badge?page_id=maxlinkeralpha.mechabellum-my9"
+                  src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fmaxlinkeralpha.github.io%2Fmechabellum-my9fav&count_bg=%2300e5ff&title_bg=%232a2a35&icon=&icon_color=%23FFFFFF&title=visitors&edge_flat=false"
                   alt="visitors"
                   className="h-5"
                 />
@@ -295,7 +298,7 @@ function App() {
                     href="https://github.com/MaxLinkerAlpha/mechabellum-my9"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] transition-colors text-xs text-[#7a7a8c] hover:text-white"
+                    className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] transition-colors text-xs text-[#7a7a8c] hover:text-white"
                   >
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
@@ -308,12 +311,13 @@ function App() {
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
               {/* 社区链接 - 手机端隐藏 */}
-              <div className="hidden sm:flex items-center gap-1.5 mr-2">
+              <div className="hidden sm:flex items-center gap-2 mr-2">
+                <span className="text-xs text-[#7a7a8c] mr-1">{t.community}</span>
                 <a
                   href="https://store.steampowered.com/app/669330/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-lg"
+                  className="w-7 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-sm"
                   title="Steam商店"
                 >
                   🎮
@@ -322,7 +326,7 @@ function App() {
                   href="https://qm.qq.com/q/226025841"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-lg"
+                  className="w-7 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-sm"
                   title="QQ交流群: 226025841"
                 >
                   💬
@@ -331,7 +335,7 @@ function App() {
                   href="https://pd.qq.com/g/pd90070872"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-lg"
+                  className="w-7 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-sm"
                   title="QQ频道"
                 >
                   📢
@@ -340,7 +344,7 @@ function App() {
                   href="https://api.xiaoheihe.cn/s/10019c"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-lg"
+                  className="w-7 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-sm"
                   title="小黑盒"
                 >
                   📦
@@ -461,14 +465,11 @@ function App() {
           <div>
             {/* 预览区域 */}
             <div className="tech-panel p-6">
-              {/* 标题区域 */}
+              {/* 标题区域 - 仅显示标题，无作者名 */}
               <div className="text-center mb-6 pb-6 border-b border-[#2c2c36]">
                 <h2 className="text-2xl font-black text-white">
                   {t.title}
                 </h2>
-                <p className="text-sm text-[#7a7a8c] mt-2">
-                  {t.author}
-                </p>
               </div>
 
               {/* 9宫格 */}
