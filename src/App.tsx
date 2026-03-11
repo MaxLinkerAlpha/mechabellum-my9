@@ -14,9 +14,9 @@ interface SelectedUnit extends Unit {
 // 社区链接配置
 const communityLinks = [
   { name: 'Steam商店', url: 'https://store.steampowered.com/app/669330/', icon: '🎮' },
-  { name: 'QQ交流群', url: 'https://qm.qq.com/q/226025841', icon: '💬', qrCode: '/qr_codes/qq_channel.png' },
-  { name: 'QQ频道', url: 'https://pd.qq.com/g/pd90070872', icon: '📢', qrCode: '/qr_codes/qq_channel.png' },
-  { name: '小黑盒', url: 'https://api.xiaoheihe.cn/s/10019c', icon: '📦', qrCode: '/qr_codes/xiaoheihe.png' },
+  { name: 'QQ交流群', url: 'https://qm.qq.com/q/226025841', icon: '💬' },
+  { name: 'QQ频道', url: 'https://pd.qq.com/g/pd90070872', icon: '📢' },
+  { name: '小黑盒', url: 'https://api.xiaoheihe.cn/s/10019c', icon: '📦' },
 ];
 
 function App() {
@@ -27,6 +27,8 @@ function App() {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['light', 'medium', 'heavy']));
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [nicknameDialogOpen, setNicknameDialogOpen] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
 
@@ -89,12 +91,20 @@ function App() {
       c: u.comment,
     }));
     const json = JSON.stringify(data);
-    // 使用 encodeURIComponent 和 btoa 进行编码
     const base64 = btoa(encodeURIComponent(json));
     return base64;
   }, [selectedUnits]);
 
-  // 导出图片（带社区链接和二维码）
+  // 打开导出对话框（检查是否选满9个）
+  const openExportDialog = useCallback(() => {
+    if (selectedUnits.length !== 9) {
+      toast.error('请选择满9个单位后再导出');
+      return;
+    }
+    setNicknameDialogOpen(true);
+  }, [selectedUnits.length]);
+
+  // 导出图片
   const exportImage = useCallback(async () => {
     if (!exportRef.current) return;
     
@@ -109,16 +119,17 @@ function App() {
       });
       
       const link = document.createElement('a');
-      link.download = `我最心爱的9个钢指单位_${Date.now()}.png`;
+      link.download = `${nickname || '玩家'}的最心爱的9个钢指单位.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
       
       toast.success('图片已保存');
+      setNicknameDialogOpen(false);
     } catch (error) {
       console.error('Export error:', error);
       toast.error('生成图片失败');
     }
-  }, []);
+  }, [nickname]);
 
   // 打开分享对话框
   const openShareDialog = useCallback(() => {
@@ -144,6 +155,7 @@ function App() {
   // 重置
   const reset = useCallback(() => {
     setSelectedUnits([]);
+    setNickname('');
     toast.info('已重置选择');
   }, []);
 
@@ -166,7 +178,6 @@ function App() {
     const shareData = params.get('s');
     if (shareData) {
       try {
-        // 使用 decodeURIComponent 和 atob 进行解码
         const json = decodeURIComponent(atob(shareData));
         const data = JSON.parse(json) as { id: string; c?: string }[];
         const loadedUnits: SelectedUnit[] = [];
@@ -178,7 +189,6 @@ function App() {
         }
         setSelectedUnits(loadedUnits);
         toast.success('已加载分享的数据');
-        // 清除URL参数
         window.history.replaceState({}, '', window.location.pathname);
       } catch (error) {
         console.error('Parse error:', error);
@@ -186,6 +196,9 @@ function App() {
       }
     }
   }, []);
+
+  // 获取当前域名用于导出图片中的二维码
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
   return (
     <div className="min-h-screen bg-[#0c0c10] text-[#f0f0f0]">
@@ -223,8 +236,8 @@ function App() {
               </Button>
               <Button
                 size="sm"
-                onClick={exportImage}
-                disabled={selectedUnits.length === 0}
+                onClick={openExportDialog}
+                disabled={selectedUnits.length !== 9}
                 className="bg-[#00e5ff] text-black hover:bg-[#00c8dd] font-bold disabled:opacity-50"
               >
                 <Download className="w-4 h-4 mr-1" />
@@ -262,7 +275,6 @@ function App() {
             {/* 单位列表 */}
             <div className="tech-panel p-4 space-y-3 max-h-[calc(100vh-220px)] overflow-y-auto">
               {searchQuery ? (
-                // 搜索结果
                 <div className="grid grid-cols-3 gap-2">
                   {filteredUnits.map(unit => {
                     const isSelected = selectedUnits.some(u => u.id === unit.id);
@@ -294,7 +306,6 @@ function App() {
                   })}
                 </div>
               ) : (
-                // 按类别分组
                 unitCategories.map(category => {
                   const categoryUnits = unitsByCategory[category.id] || [];
                   const isExpanded = expandedCategories.has(category.id);
@@ -381,7 +392,7 @@ function App() {
                       key={index}
                       className={`aspect-square rounded-lg border-2 flex flex-col items-center justify-center relative overflow-hidden ${
                         unit
-                          ? 'border-[#00e5ff] bg-[#00e5ff]/10'
+                          ? 'border-[#00e5ff] bg-[#0a1620]'
                           : 'border-dashed border-[#2c2c36] bg-[#121217]'
                       }`}
                     >
@@ -389,38 +400,40 @@ function App() {
                         <>
                           <button
                             onClick={() => removeUnit(unit.id)}
-                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#ff3d00]/80 hover:bg-[#ff3d00] text-white flex items-center justify-center text-xs z-10"
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#ff3d00]/80 hover:bg-[#ff3d00] text-white flex items-center justify-center text-xs z-20"
                           >
                             <X className="w-3 h-3" />
                           </button>
                           <button
                             onClick={() => openComment(unit)}
-                            className="absolute top-1 left-1 w-5 h-5 rounded-full bg-[#2979ff]/80 hover:bg-[#2979ff] text-white flex items-center justify-center text-xs z-10"
+                            className="absolute top-1 left-1 w-5 h-5 rounded-full bg-[#2979ff]/80 hover:bg-[#2979ff] text-white flex items-center justify-center text-xs z-20"
                           >
                             {unit.comment ? '✎' : '+'}
                           </button>
                           {/* 背景图标 */}
                           {unit.icon && (
                             <div 
-                              className="absolute inset-0 opacity-30"
+                              className="absolute inset-0 z-0"
                               style={{
                                 backgroundImage: `url(${unit.icon})`,
-                                backgroundSize: 'cover',
+                                backgroundSize: '80%',
+                                backgroundRepeat: 'no-repeat',
                                 backgroundPosition: 'center',
+                                opacity: 0.6,
                               }}
                             />
                           )}
                           <div
-                            className="text-3xl font-black mb-1 relative z-10 drop-shadow-lg"
+                            className="text-2xl font-black mb-1 relative z-10"
                             style={{
                               color: unitCategories.find(c => c.id === unit.category)?.color,
-                              textShadow: '0 0 10px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.9)',
+                              textShadow: '0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9)',
                             }}
                           >
                             {unit.s}
                           </div>
-                          <div className="font-bold text-white text-center px-1 relative z-10 drop-shadow-lg" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.9)' }}>{unit.cn}</div>
-                          <div className="text-xs text-[#a0a0b0] text-center px-1 relative z-10 drop-shadow-md" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>{unit.en}</div>
+                          <div className="font-bold text-white text-center px-1 relative z-10 text-sm" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>{unit.cn}</div>
+                          <div className="text-xs text-[#a0a0b0] text-center px-1 relative z-10" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>{unit.en}</div>
                           {unit.comment && (
                             <div className="absolute bottom-0 left-0 right-0 bg-[#00e5ff]/30 px-1 py-0.5 z-10">
                               <p className="text-[10px] text-white text-center truncate font-bold" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>
@@ -441,49 +454,50 @@ function App() {
               <div className="text-center text-xs text-[#7a7a8c]">
                 <p>已选择 {selectedUnits.length}/9 个单位</p>
                 {selectedUnits.length === 9 && (
-                  <p className="text-[#00e5ff] mt-1">✓ 选择完成！</p>
+                  <p className="text-[#00e5ff] mt-1">✓ 选择完成！点击导出生成分享图</p>
                 )}
               </div>
             </div>
 
-            {/* 导出用隐藏区域（带社区链接和二维码） */}
+            {/* 导出用隐藏区域 */}
             <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-              <div ref={exportRef} className="tech-panel p-6" style={{ width: '600px', background: '#16161d' }}>
+              <div ref={exportRef} className="tech-panel p-8" style={{ width: '650px', background: '#16161d' }}>
                 {/* 标题区域 */}
                 <div className="text-center mb-6 pb-6 border-b border-[#2c2c36]">
-                  <h2 className="text-2xl font-black text-white mb-2">
-                    我最心爱的<span className="text-[#00e5ff]">9个</span>钢指单位
+                  <h2 className="text-3xl font-black text-white mb-2">
+                    {nickname ? `${nickname}的最心爱的` : '我最心爱的'}<span style={{ color: '#00e5ff' }}>9个</span>钢指单位
                   </h2>
-                  <p className="text-sm text-[#7a7a8c]">
+                  <p className="text-base text-[#7a7a8c]">
                     钢铁指挥官 / Mechabellum
                   </p>
                 </div>
 
                 {/* 9宫格 */}
-                <div className="grid grid-cols-3 gap-3 mb-6">
+                <div className="grid grid-cols-3 gap-4 mb-8">
                   {Array.from({ length: 9 }).map((_, index) => {
                     const unit = selectedUnits[index];
                     return (
                       <div
                         key={index}
-                        className={`aspect-square rounded-lg border-2 flex flex-col items-center justify-center relative overflow-hidden ${
+                        className={`rounded-lg border-2 flex flex-col items-center justify-center relative overflow-hidden ${
                           unit
-                            ? 'border-[#00e5ff] bg-[#00e5ff]/10'
+                            ? 'border-[#00e5ff] bg-[#0a1620]'
                             : 'border-dashed border-[#2c2c36] bg-[#121217]'
                         }`}
-                        style={{ height: '150px', width: '180px' }}
+                        style={{ height: '160px', width: '190px' }}
                       >
                         {unit ? (
                           <>
                             {/* 背景图标 */}
                             {unit.icon && (
                               <div 
-                                className="absolute inset-0"
+                                className="absolute inset-0 z-0"
                                 style={{
-                                  backgroundImage: `url(${unit.icon})`,
-                                  backgroundSize: 'cover',
+                                  backgroundImage: `url(${baseUrl}${unit.icon})`,
+                                  backgroundSize: '75%',
+                                  backgroundRepeat: 'no-repeat',
                                   backgroundPosition: 'center',
-                                  opacity: 0.4,
+                                  opacity: 0.7,
                                 }}
                               />
                             )}
@@ -514,60 +528,45 @@ function App() {
                   })}
                 </div>
 
-                {/* 网页链接和二维码区域 */}
-                <div className="mt-6 pt-6 border-t border-[#2c2c36]">
-                  <p className="text-center text-sm text-[#7a7a8c] mb-4">访问网页制作你的专属分享图</p>
-                  <div className="flex items-center justify-center gap-6">
+                {/* 合并的底部信息区域 */}
+                <div className="mt-8 pt-6 border-t border-[#2c2c36]">
+                  <div className="flex items-center justify-between">
+                    {/* 左侧二维码 */}
                     <div className="text-center">
                       <img 
-                        src="/qr_codes/website.png" 
+                        src={`${baseUrl}/qr_codes/website.png`}
                         alt="网页二维码" 
                         style={{ width: '100px', height: '100px', borderRadius: '8px' }}
                       />
-                      <p className="text-xs text-[#7a7a8c] mt-2">扫码访问</p>
+                      <p className="text-xs text-[#7a7a8c] mt-2">扫码制作你的分享图</p>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-white mb-1">https://maxalphalinker.github.io/mechabellum-my9</p>
-                      <p className="text-xs text-[#7a7a8c]">我最心爱的9个钢指单位 - 钢铁指挥官玩家分享工具</p>
+                    
+                    {/* 中间链接 */}
+                    <div className="flex-1 px-6">
+                      <p className="text-base text-white mb-2">https://maxalphalinker.github.io/mechabellum-my9</p>
+                      <p className="text-sm text-[#7a7a8c]">使用「我最心爱的9个钢指单位」生成</p>
+                    </div>
+
+                    {/* 右侧社区二维码 */}
+                    <div className="flex gap-3">
+                      <div className="text-center">
+                        <img 
+                          src={`${baseUrl}/qr_codes/qq_channel.png`}
+                          alt="QQ频道" 
+                          style={{ width: '80px', height: '80px', borderRadius: '6px' }}
+                        />
+                        <p className="text-xs text-[#7a7a8c] mt-1">QQ频道</p>
+                      </div>
+                      <div className="text-center">
+                        <img 
+                          src={`${baseUrl}/qr_codes/xiaoheihe.png`}
+                          alt="小黑盒" 
+                          style={{ width: '80px', height: '80px', borderRadius: '6px' }}
+                        />
+                        <p className="text-xs text-[#7a7a8c] mt-1">小黑盒</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                {/* 社区链接和二维码区域 */}
-                <div className="mt-6 pt-6 border-t border-[#2c2c36]">
-                  <p className="text-center text-sm text-[#7a7a8c] mb-4">加入钢铁指挥官社区</p>
-                  <div className="flex items-center justify-center gap-4">
-                    {/* QQ频道二维码 */}
-                    <div className="text-center">
-                      <img 
-                        src="/qr_codes/qq_channel.png" 
-                        alt="QQ频道" 
-                        style={{ width: '90px', height: '90px', borderRadius: '8px' }}
-                      />
-                      <p className="text-xs text-white mt-1">QQ频道</p>
-                    </div>
-                    {/* 小黑盒二维码 */}
-                    <div className="text-center">
-                      <img 
-                        src="/qr_codes/xiaoheihe.png" 
-                        alt="小黑盒" 
-                        style={{ width: '90px', height: '90px', borderRadius: '8px' }}
-                      />
-                      <p className="text-xs text-white mt-1">小黑盒</p>
-                    </div>
-                    {/* 文字链接 */}
-                    <div className="text-left space-y-1">
-                      <p className="text-xs text-[#7a7a8c]">Steam: store.steampowered.com/app/669330/</p>
-                      <p className="text-xs text-[#7a7a8c]">QQ交流群: 226025841</p>
-                      <p className="text-xs text-[#7a7a8c]">QQ频道: pd.qq.com/g/pd90070872</p>
-                      <p className="text-xs text-[#7a7a8c]">小黑盒: api.xiaoheihe.cn/s/10019c</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 底部信息 */}
-                <div className="text-center text-xs text-[#7a7a8c] mt-6 pt-4 border-t border-[#2c2c36]">
-                  <p>使用 我最心爱的9个钢指单位 生成</p>
                 </div>
               </div>
             </div>
@@ -618,10 +617,10 @@ function App() {
           </div>
         </div>
 
-        {/* 网页底部社区链接 */}
+        {/* 网页底部社区链接 - 只保留图标 */}
         <div className="mt-12 pt-8 border-t border-[#2c2c36]">
           <h3 className="text-center text-lg font-bold text-white mb-6">加入钢铁指挥官社区</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
             {communityLinks.map(link => (
               <a
                 key={link.name}
@@ -634,38 +633,6 @@ function App() {
                 <span className="text-sm text-white font-medium">{link.name}</span>
               </a>
             ))}
-          </div>
-          
-          {/* 链接详情 */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3 max-w-3xl mx-auto text-xs text-[#7a7a8c]">
-            <div className="flex items-center gap-2 p-3 bg-[#16161d] rounded-lg">
-              <span className="text-lg">🎮</span>
-              <div>
-                <p className="text-white font-medium">Steam商店</p>
-                <p>store.steampowered.com/app/669330/</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 p-3 bg-[#16161d] rounded-lg">
-              <span className="text-lg">💬</span>
-              <div>
-                <p className="text-white font-medium">钢铁指挥官交流5群</p>
-                <p>226025841</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 p-3 bg-[#16161d] rounded-lg">
-              <span className="text-lg">📢</span>
-              <div>
-                <p className="text-white font-medium">钢铁指挥官QQ频道</p>
-                <p>pd.qq.com/g/pd90070872</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 p-3 bg-[#16161d] rounded-lg">
-              <span className="text-lg">📦</span>
-              <div>
-                <p className="text-white font-medium">游戏河小黑盒官方账号</p>
-                <p>api.xiaoheihe.cn/s/10019c</p>
-              </div>
-            </div>
           </div>
         </div>
       </main>
@@ -700,6 +667,43 @@ function App() {
                 className="flex-1 bg-[#00e5ff] text-black hover:bg-[#00c8dd] font-bold"
               >
                 保存
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 昵称输入对话框 */}
+      <Dialog open={nicknameDialogOpen} onOpenChange={setNicknameDialogOpen}>
+        <DialogContent className="bg-[#16161d] border-[#2c2c36] text-white max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold">生成分享图</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <label className="text-sm text-[#7a7a8c] mb-2 block">输入你的昵称（可选）</label>
+              <input
+                type="text"
+                value={nickname}
+                onChange={e => setNickname(e.target.value)}
+                placeholder="例如：钢铁指挥官"
+                className="tech-input w-full"
+                maxLength={20}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setNicknameDialogOpen(false)}
+                className="flex-1 border-[#444] bg-transparent hover:bg-[#23232c]"
+              >
+                取消
+              </Button>
+              <Button
+                onClick={exportImage}
+                className="flex-1 bg-[#00e5ff] text-black hover:bg-[#00c8dd] font-bold"
+              >
+                生成图片
               </Button>
             </div>
           </div>
