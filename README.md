@@ -9,11 +9,20 @@
 - **删除未使用的 hook**：use-mobile.ts
 - **保留组件**：button.tsx, dialog.tsx（实际使用）
 
+### 2026-03-12 精简项目依赖
+- **核心框架**：React 19 + Vite 7
+- **UI 组件**：Radix UI (Dialog, Slot)
+- **样式工具**：Tailwind CSS + tailwindcss-animate + class-variance-authority + clsx + tailwind-merge
+- **功能库**：html2canvas（图片导出）+ sonner（Toast 通知）+ lucide-react（图标）
+- **开发工具**：TypeScript 5.9
+
+**依赖清理**：从 58 个依赖包精简至 11 个，node_modules 体积显著减小
+
 一个受 [my9](https://github.com/SomiaWhiteRing/my9) 启发的网页应用，让钢铁指挥官玩家可以选择并分享构成自己战术风格的9个单位。
 
 ## 在线体验
 
-[点击访问](https://你的用户名.github.io/mechabellum-my9)
+[点击访问](https://maxlinkeralpha.github.io/mechabellum-my9fav)
 
 ## 功能特性
 

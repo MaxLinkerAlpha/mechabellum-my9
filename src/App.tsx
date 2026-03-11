@@ -498,8 +498,8 @@ function App() {
                               alt={unit.cn}
                               className="absolute inset-0 w-full h-full object-contain z-0"
                               style={{ 
-                                opacity: 0.8,
-                                transform: 'scale(0.75)',
+                                opacity: 0.9,
+                                transform: 'scale(0.85)',
                                 filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
                               }}
                               onError={(e) => {
@@ -509,22 +509,10 @@ function App() {
                             />
                           )}
                           
-                          {/* 单位信息 */}
-                          <div className="relative z-10 flex flex-col items-center">
-                            <div
-                              className="text-2xl font-black mb-1"
-                              style={{
-                                color: unitCategories.find(c => c.id === unit.category)?.color,
-                                textShadow: '0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9)',
-                              }}
-                            >
-                              {unit.s}
-                            </div>
+                          {/* 单位名称 - 悬浮在图标上方 */}
+                          <div className="absolute bottom-1 left-0 right-0 z-10 flex flex-col items-center bg-gradient-to-t from-black/80 to-transparent pt-4 pb-1">
                             <div className="font-bold text-white text-center px-1 text-sm" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
                               {lang === 'zh' ? unit.cn : unit.en}
-                            </div>
-                            <div className="text-xs text-[#a0a0b0] text-center px-1" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>
-                              {lang === 'zh' ? unit.en : unit.cn}
                             </div>
                           </div>
                           
@@ -591,28 +579,17 @@ function App() {
                                 alt={unit.cn}
                                 className="absolute inset-0 w-full h-full object-contain z-0"
                                 style={{ 
-                                  opacity: 0.7,
-                                  transform: 'scale(0.7)',
+                                  opacity: 0.85,
+                                  transform: 'scale(0.8)',
                                   filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
                                 }}
                                 crossOrigin="anonymous"
                               />
                             )}
-                            <div className="relative z-10 flex flex-col items-center" style={{ marginTop: unit.comment ? '-10px' : '0' }}>
-                              <div
-                                className="text-3xl font-black mb-1"
-                                style={{
-                                  color: unitCategories.find(c => c.id === unit.category)?.color,
-                                  textShadow: '0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9)',
-                                }}
-                              >
-                                {unit.s}
-                              </div>
+                            {/* 单位名称 - 悬浮在底部 */}
+                            <div className="absolute bottom-2 left-0 right-0 z-10 flex flex-col items-center bg-gradient-to-t from-black/80 to-transparent pt-4 pb-1">
                               <div className="font-bold text-white text-base text-center px-1" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
                                 {lang === 'zh' ? unit.cn : unit.en}
-                              </div>
-                              <div className="text-xs text-[#a0a0b0] text-center px-1" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>
-                                {lang === 'zh' ? unit.en : unit.cn}
                               </div>
                             </div>
                             {unit.comment && (
@@ -631,10 +608,26 @@ function App() {
                   })}
                 </div>
 
-                {/* 底部信息 - 仅文字 */}
-                <div className="mt-8 pt-6 border-t border-[#2c2c36] text-center">
-                  <p className="text-lg text-white mb-2">maxalphalinker.github.io/mechabellum-my9</p>
-                  <p className="text-base text-[#7a7a8c]">{lang === 'zh' ? '将网址输入浏览器地址栏，制作你的钢指Top9' : 'Enter the URL in browser to create your Mecha Top9'}</p>
+                {/* 底部信息 - 带二维码 */}
+                <div className="mt-6 pt-6 border-t border-[#2c2c36]">
+                  <div className="flex items-center justify-center gap-6">
+                    {/* 二维码 */}
+                    <div className="flex flex-col items-center">
+                      <img 
+                        src={`${baseUrl}/qr_codes/website.png`}
+                        alt="QR Code"
+                        className="w-20 h-20 rounded-lg border border-[#2c2c36]"
+                        crossOrigin="anonymous"
+                      />
+                      <span className="text-xs text-[#7a7a8c] mt-1.5">{t.scanToVisit}</span>
+                    </div>
+                    {/* 文字信息 */}
+                    <div className="text-left">
+                      <p className="text-base text-white mb-1">maxalphalinker.github.io/mechabellum-my9fav</p>
+                      <p className="text-sm text-[#7a7a8c]">{lang === 'zh' ? '扫码或输入网址，制作你的钢指Top9' : 'Scan or enter URL to create your Mecha Top9'}</p>
+                      <p className="text-xs text-[#5a5a6c] mt-2">{t.generatedBy}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
