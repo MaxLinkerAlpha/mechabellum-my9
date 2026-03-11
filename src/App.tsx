@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Unit } from './data/units';
 import { units as allUnits, unitCategories } from './data/units';
-import { X, Download, Share2, RotateCcw, ChevronDown, ChevronUp, ExternalLink, Globe, MessageSquarePlus } from 'lucide-react';
+import { X, Download, Share2, RotateCcw, Globe, MessageSquarePlus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -39,17 +39,10 @@ const translations = {
     shareTitle: '分享你的选择',
     shareLink: '分享链接',
     copyLink: '复制链接',
-    joinCommunity: '加入钢铁指挥官社区',
-    steamStore: 'Steam商店',
-    qqGroup: 'QQ交流群',
-    qqChannel: 'QQ频道',
-    xiaoheihe: '小黑盒',
-    scanToVisit: '扫码制作你的分享图',
+
     generatedBy: 'Max Linker with Kimi',
     switchLang: 'English',
-    lightUnits: '轻型单位',
-    mediumUnits: '中型单位',
-    heavyUnits: '重型/超重型单位',
+
     selectedList: '已选单位列表',
     author: 'Max Linker with Kimi',
   },
@@ -77,29 +70,16 @@ const translations = {
     shareTitle: 'Share Your Selection',
     shareLink: 'Share Link',
     copyLink: 'Copy Link',
-    joinCommunity: 'Join Mechabellum Community',
-    steamStore: 'Steam Store',
-    qqGroup: 'QQ Group',
-    qqChannel: 'QQ Channel',
-    xiaoheihe: 'Xiaoheihe',
-    scanToVisit: 'Scan to create your share image',
+
     generatedBy: 'Max Linker with Kimi',
     switchLang: '中文',
-    lightUnits: 'Light Units',
-    mediumUnits: 'Medium Units',
-    heavyUnits: 'Heavy/Super Heavy Units',
+
     selectedList: 'Selected Units',
     author: 'Max Linker with Kimi',
   },
 };
 
-// 社区链接配置
-const communityLinks = [
-  { name: 'Steam商店', nameEn: 'Steam Store', url: 'https://store.steampowered.com/app/669330/', icon: '🎮' },
-  { name: 'QQ交流群', nameEn: 'QQ Group', url: 'https://qm.qq.com/q/226025841', icon: '💬' },
-  { name: 'QQ频道', nameEn: 'QQ Channel', url: 'https://pd.qq.com/g/pd90070872', icon: '📢' },
-  { name: '小黑盒', nameEn: 'Xiaoheihe', url: 'https://api.xiaoheihe.cn/s/10019c', icon: '📦' },
-];
+
 
 function App() {
   const [lang, setLang] = useState<Language>('zh');
@@ -108,7 +88,6 @@ function App() {
   const [selectedUnits, setSelectedUnits] = useState<SelectedUnit[]>([]);
   const [commentUnit, setCommentUnit] = useState<SelectedUnit | null>(null);
   const [commentText, setCommentText] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['light', 'medium', 'heavy']));
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [nickname, setNickname] = useState('');
@@ -120,13 +99,6 @@ function App() {
   const toggleLang = useCallback(() => {
     setLang(prev => prev === 'zh' ? 'en' : 'zh');
   }, []);
-
-  // 按类别分组
-  const unitsByCategory = allUnits.reduce((acc, unit) => {
-    if (!acc[unit.category]) acc[unit.category] = [];
-    acc[unit.category].push(unit);
-    return acc;
-  }, {} as Record<string, Unit[]>);
 
   // 选择单位
   const selectUnit = useCallback((unit: Unit) => {
@@ -260,19 +232,6 @@ function App() {
     toast.info(lang === 'zh' ? '已重置选择' : 'Selection reset');
   }, [lang]);
 
-  // 切换类别展开
-  const toggleCategory = useCallback((category: string) => {
-    setExpandedCategories(prev => {
-      const next = new Set(prev);
-      if (next.has(category)) {
-        next.delete(category);
-      } else {
-        next.add(category);
-      }
-      return next;
-    });
-  }, []);
-
   // 从URL加载分享数据
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -297,13 +256,6 @@ function App() {
       }
     }
   }, [lang]);
-
-  // 获取类别名称
-  const getCategoryName = (id: string) => {
-    if (id === 'light') return t.lightUnits;
-    if (id === 'medium') return t.mediumUnits;
-    return t.heavyUnits;
-  };
 
   return (
     <div className="min-h-screen bg-[#0c0c10] text-[#f0f0f0]">
@@ -374,79 +326,58 @@ function App() {
               </p>
             </div>
 
-            {/* 单位列表 */}
-            <div className="tech-panel p-4 space-y-3 max-h-[calc(100vh-220px)] overflow-y-auto">
-              {unitCategories.map(category => {
-                const categoryUnits = unitsByCategory[category.id] || [];
-                const isExpanded = expandedCategories.has(category.id);
-                
-                return (
-                  <div key={category.id} className="border border-[#2a2a35] rounded-lg overflow-hidden">
+            {/* 单位列表 - 平铺显示 */}
+            <div className="tech-panel p-4 max-h-[calc(100vh-220px)] overflow-y-auto">
+              <div className="grid grid-cols-4 gap-3">
+                {allUnits.map(unit => {
+                  const isSelected = selectedUnits.some(u => u.id === unit.id);
+                  const category = unitCategories.find(c => c.id === unit.category);
+                  return (
                     <button
-                      onClick={() => toggleCategory(category.id)}
-                      className="w-full flex items-center justify-between p-3 bg-[#1a1a22] hover:bg-[#22222a] transition-colors"
+                      key={unit.id}
+                      onClick={() => selectUnit(unit)}
+                      className={`relative overflow-hidden rounded-lg border-2 transition-all ${
+                        isSelected 
+                          ? 'border-[#00e5ff] bg-[#00e5ff]/10' 
+                          : 'border-[#2a2a35] bg-[#1a1a22] hover:border-[#444]'
+                      }`}
+                      style={{ aspectRatio: '1/1' }}
                     >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-2 h-2 rounded-full"
-                          style={{ background: category.color }}
+                      {/* 单位图标 */}
+                      {unit.icon && (
+                        <img 
+                          src={unit.icon}
+                          alt={unit.cn}
+                          className="absolute inset-0 w-full h-full object-contain p-2"
+                          style={{ 
+                            opacity: isSelected ? 0.5 : 0.9,
+                          }}
+                          onError={(e) => {
+                            console.log('Icon load failed:', unit.icon);
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
                         />
-                        <span className="font-bold">{getCategoryName(category.id)}</span>
-                        <span className="text-xs text-[#7a7a8c]">({categoryUnits.length})</span>
-                      </div>
-                      {isExpanded ? (
-                        <ChevronUp className="w-4 h-4 text-[#7a7a8c]" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-[#7a7a8c]" />
                       )}
-                    </button>
-                    
-                    {isExpanded && (
-                      <div className="p-2 grid grid-cols-3 gap-2">
-                        {categoryUnits.map(unit => {
-                          const isSelected = selectedUnits.some(u => u.id === unit.id);
-                          return (
-                            <button
-                              key={unit.id}
-                              onClick={() => selectUnit(unit)}
-                              className={`unit-card p-2 text-left relative overflow-hidden ${isSelected ? 'selected' : ''}`}
-                              style={{ minHeight: '80px' }}
-                            >
-                              {/* 单位图标 */}
-                              {unit.icon && (
-                                <img 
-                                  src={unit.icon}
-                                  alt={unit.cn}
-                                  className="absolute inset-0 w-full h-full object-contain z-0"
-                                  style={{ 
-                                    opacity: isSelected ? 0.4 : 0.7,
-                                    transform: 'scale(0.9)',
-                                  }}
-                                  onError={(e) => {
-                                    console.log('Icon load failed:', unit.icon);
-                                    (e.target as HTMLImageElement).style.display = 'none';
-                                  }}
-                                />
-                              )}
-                              
-                              {/* 选择标记 */}
-                              {isSelected && (
-                                <span className="absolute top-1 right-1 text-[#00e5ff] text-xs z-10">✓</span>
-                              )}
-                              
-                              {/* 单位名称 */}
-                              <div className="relative z-10 mt-auto">
-                                <div className="font-bold text-sm truncate text-white" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>{lang === 'zh' ? unit.cn : unit.en}</div>
-                                <div className="text-xs text-[#a0a0b0] truncate" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>{lang === 'zh' ? unit.en : unit.cn}</div>
-                              </div>
-                            </button>
-                          );
-                        })}
+                      
+                      {/* 选择标记 */}
+                      {isSelected && (
+                        <span className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#00e5ff] text-black text-xs flex items-center justify-center z-10 font-bold">✓</span>
+                      )}
+                      
+                      {/* 类别标记 */}
+                      <span
+                        className="absolute top-1 left-1 w-2 h-2 rounded-full z-10"
+                        style={{ background: category?.color }}
+                      />
+                      
+                      {/* 单位名称 */}
+                      <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/90 to-transparent z-10">
+                        <div className="font-bold text-xs text-white text-center truncate" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>{lang === 'zh' ? unit.cn : unit.en}</div>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -628,13 +559,11 @@ function App() {
                         className="w-20 h-20 rounded-lg border border-[#2c2c36]"
                         crossOrigin="anonymous"
                       />
-                      <span className="text-xs text-[#7a7a8c] mt-1.5">{t.scanToVisit}</span>
                     </div>
                     {/* 文字信息 */}
                     <div className="text-left">
                       <p className="text-base text-white mb-1">maxalphalinker.github.io/mechabellum-my9fav</p>
                       <p className="text-sm text-[#7a7a8c]">{lang === 'zh' ? '扫码或输入网址，制作你的钢指Top9' : 'Scan or enter URL to create your Mecha Top9'}</p>
-                      <p className="text-xs text-[#5a5a6c] mt-2">{t.generatedBy}</p>
                     </div>
                   </div>
                 </div>
@@ -684,25 +613,6 @@ function App() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* 网页底部社区链接 */}
-        <div className="mt-12 pt-8 border-t border-[#2c2c36]">
-          <h3 className="text-center text-lg font-bold text-white mb-6">{t.joinCommunity}</h3>
-          <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
-            {communityLinks.map(link => (
-              <a
-                key={link.name}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center p-4 bg-[#16161d] rounded-lg border border-[#2a2a35] hover:border-[#00e5ff] transition-colors group"
-              >
-                <span className="text-3xl mb-2 group-hover:scale-110 transition-transform">{link.icon}</span>
-                <span className="text-sm text-white font-medium">{lang === 'zh' ? link.name : link.nameEn}</span>
-              </a>
-            ))}
           </div>
         </div>
       </main>
@@ -811,26 +721,7 @@ function App() {
             >
               {t.copyLink}
             </Button>
-            
-            {/* 社区链接 */}
-            <div className="pt-4 border-t border-[#2c2c36]">
-              <p className="text-sm text-[#7a7a8c] mb-3">{t.joinCommunity}</p>
-              <div className="space-y-2">
-                {communityLinks.map(link => (
-                  <a
-                    key={link.name}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-2 bg-[#1a1a22] rounded-lg border border-[#2a2a35] hover:border-[#00e5ff] transition-colors"
-                  >
-                    <span className="text-lg">{link.icon}</span>
-                    <span className="text-sm text-white flex-1">{lang === 'zh' ? link.name : link.nameEn}</span>
-                    <ExternalLink className="w-4 h-4 text-[#7a7a8c]" />
-                  </a>
-                ))}
-              </div>
-            </div>
+
           </div>
         </DialogContent>
       </Dialog>
