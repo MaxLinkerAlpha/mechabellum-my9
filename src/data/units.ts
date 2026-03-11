@@ -30,6 +30,8 @@ export const units: Unit[] = [
   { id: '12', cn: '骇客', en: 'Hacker', s: '骇', category: 'light', icon: './unit_icon/14_骇客_Hacker_Icon_1.png' },
   { id: '15', cn: '兵蜂', en: 'Wasp', s: '蜂', category: 'light', icon: './unit_icon/6_兵峰_Wasp_Icon_1.png' },
   { id: '19', cn: '猎犬', en: 'Hound', s: '犬', category: 'light', icon: './unit_icon/28_猎犬_Hound_Icon_1.png' },
+  { id: '31', cn: '鬼鳐', en: 'Phantom Ray', s: '鳐', category: 'light', icon: './unit_icon/25_鬼鳐_Phantom Ray_Icon_1.png' },
+  { id: '32', cn: '先知', en: 'Farseer', s: '先', category: 'light', icon: './unit_icon/26_先知_Farseer_Icon_1.png' },
   
   // 中型单位
   { id: '3', cn: '长弓', en: 'Marksman', s: '弓', category: 'medium', icon: './unit_icon/2_长弓_Marksman_Icon_1.png' },
@@ -55,6 +57,9 @@ export const units: Unit[] = [
   { id: '29', cn: '魔眼', en: 'Void Eye', s: '眼', category: 'heavy', icon: './unit_icon/30_魔眼_Void Eye_Icon_1.png' },
   { id: '30', cn: '丧钟', en: 'Death Knell', s: '钟', category: 'heavy', icon: './unit_icon/2001_丧钟_Death Knell_Icon_1.png' },
   { id: '24', cn: '战争工厂', en: 'War Factory', s: '厂', category: 'heavy', icon: './unit_icon/17_战争工厂_War Factory_Icon_1.png' },
+  { id: '33', cn: '深渊', en: 'Abyss', s: '渊', category: 'heavy', icon: './unit_icon/29_深渊_Abyss_Icon_1.png' },
+  { id: '34', cn: '磁暴', en: 'Vortex', s: '磁', category: 'heavy', icon: './unit_icon/31_磁暴_Vortex_Icon_1.png' },
+  { id: '35', cn: '泰山', en: 'Mountain', s: '山', category: 'heavy', icon: './unit_icon/2002_泰山_Mountain_Icon_1.png' },
 ];
 
 // 按类别获取单位

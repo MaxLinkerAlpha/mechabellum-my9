@@ -651,49 +651,6 @@ function App() {
               </div>
             </div>
 
-            {/* 已选列表 */}
-            {selectedUnits.length > 0 && (
-              <div className="mt-4 tech-panel p-4">
-                <h3 className="font-bold text-white mb-3">{t.selectedList}</h3>
-                <div className="space-y-2">
-                  {selectedUnits.map((unit, index) => {
-                    const category = unitCategories.find(c => c.id === unit.category);
-                    return (
-                      <div
-                        key={unit.id}
-                        className="flex items-center gap-3 p-2 bg-[#1a1a22] rounded-lg"
-                      >
-                        <span className="text-[#7a7a8c] text-sm w-6">{index + 1}</span>
-                        <span
-                          className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
-                          style={{
-                            background: `${category?.color}20`,
-                            color: category?.color,
-                          }}
-                        >
-                          {unit.s}
-                        </span>
-                        <div className="flex-1">
-                          <div className="font-bold text-sm">{lang === 'zh' ? unit.cn : unit.en}</div>
-                          <div className="text-xs text-[#7a7a8c]">{lang === 'zh' ? unit.en : unit.cn}</div>
-                        </div>
-                        {unit.comment && (
-                          <span className="text-xs text-[#00e5ff] truncate max-w-[100px]">
-                            {unit.comment}
-                          </span>
-                        )}
-                        <button
-                          onClick={() => removeUnit(unit.id)}
-                          className="text-[#7a7a8c] hover:text-[#ff3d00] transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </main>
