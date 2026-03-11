@@ -16,7 +16,7 @@
 - **导出图片**：一键生成带二维码的分享图片
 - **分享链接**：生成可分享的链接，他人可查看你的选择
 - **社区入口**：顶部集成Steam商店、QQ群、QQ频道、小黑盒链接
-- **GitHub Stars**：实时显示项目Stars数量
+- **响应式设计**：适配桌面端和移动端
 
 ## 技术栈
 
@@ -47,7 +47,8 @@ public/
 
 ## 添加新单位
 
-编辑 `src/data/units.ts`：
+1. 将单位图标放入 `public/unit_icon/` 目录
+2. 编辑 `src/data/units.ts`，按格式添加单位数据：
 
 ```typescript
 {
@@ -55,12 +56,10 @@ public/
   cn: '新单位中文名',
   en: 'New Unit Name', 
   s: '缩',
-  category: 'heavy',  // light/medium/heavy
+  category: 'heavy',
   icon: './unit_icon/xxx.png'
 }
 ```
-
-添加单位图标到 `public/unit_icon/` 目录。
 
 ## 本地开发
 
