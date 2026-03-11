@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Unit } from './data/units';
-import { units as allUnits, unitCategories } from './data/units';
+import { units as allUnits } from './data/units';
 import { X, Download, Share2, RotateCcw, Globe, MessageSquarePlus, Copy } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -318,42 +318,67 @@ function App() {
               {/* 社区链接 - 手机端隐藏 */}
               <div className="hidden sm:flex items-center gap-2 mr-2">
                 <span className="text-xs text-[#7a7a8c] mr-1">{t.community}</span>
-                <a
-                  href="https://store.steampowered.com/app/669330/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-7 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-sm"
-                  title="Steam商店"
-                >
-                  🎮
-                </a>
-                <a
-                  href="https://qm.qq.com/q/226025841"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-7 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-sm"
-                  title="QQ交流群: 226025841"
-                >
-                  💬
-                </a>
-                <a
-                  href="https://pd.qq.com/g/pd90070872"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-7 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-sm"
-                  title="QQ频道"
-                >
-                  📢
-                </a>
-                <a
-                  href="https://api.xiaoheihe.cn/s/10019c"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-7 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-sm"
-                  title="小黑盒"
-                >
-                  📦
-                </a>
+                {lang === 'zh' ? (
+                  <>
+                    <a
+                      href="https://store.steampowered.com/app/669330/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      title="Steam商店"
+                    >
+                      Steam
+                    </a>
+                    <a
+                      href="https://qm.qq.com/q/226025841"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      title="QQ群"
+                    >
+                      QQ群
+                    </a>
+                    <a
+                      href="https://pd.qq.com/g/pd90070872"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      title="QQ频道"
+                    >
+                      频道
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <a
+                      href="https://discord.gg/mechabellum"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      title="Discord"
+                    >
+                      Discord
+                    </a>
+                    <a
+                      href="https://www.reddit.com/r/Mechabellum/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      title="Reddit"
+                    >
+                      Reddit
+                    </a>
+                    <a
+                      href="https://steamcommunity.com/app/669330/discussions/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      title="Steam Discussions"
+                    >
+                      Steam
+                    </a>
+                  </>
+                )}
               </div>
               
               <div className="hidden sm:block w-px h-6 bg-[#2c2c36]" />
