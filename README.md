@@ -15,7 +15,7 @@
 - **添加备注**：为每个单位添加个性化评价（最多50字）
 - **导出图片**：一键生成带二维码的分享图片
 - **分享链接**：生成可分享的链接，他人可查看你的选择
-- **社区入口**：顶部集成Steam商店、QQ群、QQ频道、小黑盒链接
+- **社区入口**：中文用户（Steam/QQ群/QQ频道）和英文用户（Discord/Reddit/Steam）
 - **响应式设计**：适配桌面端和移动端
 
 ## 技术栈
@@ -56,7 +56,6 @@ public/
   cn: '新单位中文名',
   en: 'New Unit Name', 
   s: '缩',
-  category: 'heavy',
   icon: './unit_icon/xxx.png'
 }
 ```
@@ -94,10 +93,15 @@ npm run build
 
 ## 社区链接
 
+**中文社区：**
 - **Steam商店**: https://store.steampowered.com/app/669330/
 - **QQ交流群**: 226025841
 - **QQ频道**: https://pd.qq.com/g/pd90070872
-- **小黑盒**: https://api.xiaoheihe.cn/s/10019c
+
+**国际社区：**
+- **Discord**: https://discord.gg/mechabellum
+- **Reddit**: https://www.reddit.com/r/Mechabellum/
+- **Steam Discussions**: https://steamcommunity.com/app/669330/discussions/
 
 ## 致谢
 
