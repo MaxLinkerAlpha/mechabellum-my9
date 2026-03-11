@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Unit } from './data/units';
 import { units as allUnits, unitCategories } from './data/units';
-import { Search, X, Download, Share2, RotateCcw, ChevronDown, ChevronUp, ExternalLink, Globe, MessageSquarePlus } from 'lucide-react';
+import { X, Download, Share2, RotateCcw, ChevronDown, ChevronUp, ExternalLink, Globe, MessageSquarePlus, Eye } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -16,13 +16,13 @@ type Language = 'zh' | 'en';
 // 翻译文本
 const translations = {
   zh: {
-    title: '我最心爱的',
-    titleSuffix: '钢指单位',
+    title: '我最心爱的9个钢指单位',
+    titleSuffix: '',
     subtitle: '选择你最心爱的9个钢铁指挥官单位',
     reset: '重置',
     share: '分享',
     export: '导出',
-    searchPlaceholder: '搜索单位名称...',
+    preview: '预览',
     selected: '已选择',
     of9: '/9 个单位',
     complete: '✓ 选择完成！点击导出生成分享图',
@@ -30,7 +30,6 @@ const translations = {
     max9: '最多只能选择9个单位',
     addComment: '添加备注',
     editComment: '编辑备注',
-    commentHint: '点击 + 添加备注',
     commentPlaceholder: '输入你对这个单位的评价...',
     cancel: '取消',
     save: '保存',
@@ -46,21 +45,22 @@ const translations = {
     qqChannel: 'QQ频道',
     xiaoheihe: '小黑盒',
     scanToVisit: '扫码制作你的分享图',
-    generatedBy: '使用「我最心爱的9个钢指单位」生成',
+    generatedBy: 'Max Linker with Kimi',
     switchLang: 'English',
     lightUnits: '轻型单位',
     mediumUnits: '中型单位',
     heavyUnits: '重型/超重型单位',
     selectedList: '已选单位列表',
+    author: 'Max Linker with Kimi',
   },
   en: {
-    title: 'My 9 Favorite',
-    titleSuffix: 'Mechabellum Units',
+    title: 'My 9 Favorite Mechabellum Units',
+    titleSuffix: '',
     subtitle: 'Choose your 9 favorite Mechabellum units',
     reset: 'Reset',
     share: 'Share',
     export: 'Export',
-    searchPlaceholder: 'Search unit name...',
+    preview: 'Preview',
     selected: 'Selected',
     of9: '/9 units',
     complete: '✓ Complete! Click Export to generate image',
@@ -68,7 +68,6 @@ const translations = {
     max9: 'Maximum 9 units allowed',
     addComment: 'Add Note',
     editComment: 'Edit Note',
-    commentHint: 'Click + to add note',
     commentPlaceholder: 'Enter your thoughts on this unit...',
     cancel: 'Cancel',
     save: 'Save',
@@ -84,12 +83,13 @@ const translations = {
     qqChannel: 'QQ Channel',
     xiaoheihe: 'Xiaoheihe',
     scanToVisit: 'Scan to create your share image',
-    generatedBy: 'Generated with "My 9 Favorite Mechabellum Units"',
+    generatedBy: 'Max Linker with Kimi',
     switchLang: '中文',
     lightUnits: 'Light Units',
     mediumUnits: 'Medium Units',
     heavyUnits: 'Heavy/Super Heavy Units',
     selectedList: 'Selected Units',
+    author: 'Max Linker with Kimi',
   },
 };
 
@@ -106,15 +106,14 @@ function App() {
   const t = translations[lang];
   
   const [selectedUnits, setSelectedUnits] = useState<SelectedUnit[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [commentUnit, setCommentUnit] = useState<SelectedUnit | null>(null);
   const [commentText, setCommentText] = useState('');
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['light', 'medium', 'heavy']));
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [nickname, setNickname] = useState('');
-  const [nicknameDialogOpen, setNicknameDialogOpen] = useState(false);
-  const resultRef = useRef<HTMLDivElement>(null);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string>('');
   const exportRef = useRef<HTMLDivElement>(null);
 
   // 切换语言
@@ -122,18 +121,8 @@ function App() {
     setLang(prev => prev === 'zh' ? 'en' : 'zh');
   }, []);
 
-  // 过滤单位
-  const filteredUnits = searchQuery.trim()
-    ? allUnits.filter(
-        u =>
-          u.cn.includes(searchQuery) ||
-          u.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          u.s.includes(searchQuery)
-      )
-    : allUnits;
-
   // 按类别分组
-  const unitsByCategory = filteredUnits.reduce((acc, unit) => {
+  const unitsByCategory = allUnits.reduce((acc, unit) => {
     if (!acc[unit.category]) acc[unit.category] = [];
     acc[unit.category].push(unit);
     return acc;
@@ -187,12 +176,29 @@ function App() {
   }, [selectedUnits]);
 
   // 打开导出对话框（检查是否选满9个）
-  const openExportDialog = useCallback(() => {
+  const openExportDialog = useCallback(async () => {
     if (selectedUnits.length !== 9) {
       toast.error(t.need9);
       return;
     }
-    setNicknameDialogOpen(true);
+    setExportDialogOpen(true);
+    // 生成预览
+    setTimeout(async () => {
+      if (exportRef.current) {
+        try {
+          const canvas = await html2canvas(exportRef.current, {
+            backgroundColor: '#16161d',
+            scale: 1,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+          });
+          setPreviewImage(canvas.toDataURL('image/png'));
+        } catch (error) {
+          console.error('Preview error:', error);
+        }
+      }
+    }, 100);
   }, [selectedUnits.length, t]);
 
   // 导出图片
@@ -200,7 +206,7 @@ function App() {
     if (!exportRef.current) return;
     
     try {
-      toast.info('Generating...');
+      toast.info(lang === 'zh' ? '正在生成...' : 'Generating...');
       const canvas = await html2canvas(exportRef.current, {
         backgroundColor: '#16161d',
         scale: 2,
@@ -218,7 +224,7 @@ function App() {
       link.click();
       
       toast.success(lang === 'zh' ? '图片已保存' : 'Image saved');
-      setNicknameDialogOpen(false);
+      setExportDialogOpen(false);
     } catch (error) {
       console.error('Export error:', error);
       toast.error(lang === 'zh' ? '生成图片失败' : 'Failed to generate image');
@@ -240,7 +246,7 @@ function App() {
   // 复制分享链接
   const copyShareLink = useCallback(() => {
     navigator.clipboard.writeText(shareUrl).then(() => {
-      toast.success(lang === 'zh' ? '分享链接已复制到剪贴板' : 'Share link copied');
+      toast.success(lang === 'zh' ? '分享链接已复制' : 'Share link copied');
     }).catch(() => {
       toast.error(lang === 'zh' ? '复制失败' : 'Copy failed');
     });
@@ -250,6 +256,7 @@ function App() {
   const reset = useCallback(() => {
     setSelectedUnits([]);
     setNickname('');
+    setPreviewImage('');
     toast.info(lang === 'zh' ? '已重置选择' : 'Selection reset');
   }, [lang]);
 
@@ -286,7 +293,7 @@ function App() {
         window.history.replaceState({}, '', window.location.pathname);
       } catch (error) {
         console.error('Parse error:', error);
-        toast.error(lang === 'zh' ? '分享链接无效或已损坏' : 'Invalid share link');
+        toast.error(lang === 'zh' ? '分享链接无效' : 'Invalid share link');
       }
     }
   }, [lang]);
@@ -298,7 +305,7 @@ function App() {
     return t.heavyUnits;
   };
 
-  // 获取当前域名用于导出图片中的二维码
+  // 获取当前域名
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
   return (
@@ -309,7 +316,7 @@ function App() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-black tracking-tight text-white">
-                {t.title}<span className="text-[#00e5ff]">9</span>{t.titleSuffix}
+                {t.title}
               </h1>
               <p className="text-sm text-[#7a7a8c] mt-1">{t.subtitle}</p>
             </div>
@@ -360,144 +367,91 @@ function App() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* 左侧：单位选择 */}
           <div className="space-y-4">
-            {/* 搜索栏 */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7a7a8c]" />
-              <input
-                type="text"
-                placeholder={t.searchPlaceholder}
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="tech-input pl-10"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7a7a8c] hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
             {/* 提示 */}
             <div className="bg-[#1a1a22] border border-[#2a2a35] rounded-lg p-3 text-sm text-[#7a7a8c]">
-              <p>💡 {lang === 'zh' ? '点击单位添加到右侧，点击已选单位上的' : 'Click units to add to the right, click '}
+              <p>💡 {lang === 'zh' ? '点击单位添加到右侧，点击已选单位上的' : 'Click units to add, click '}
                 <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#2979ff] text-white text-xs mx-1">
                   <MessageSquarePlus className="w-3 h-3" />
                 </span>
-                {lang === 'zh' ? '添加备注' : ' on selected units to add notes'}
+                {lang === 'zh' ? '添加备注' : 'on selected units to add notes'}
               </p>
             </div>
 
             {/* 单位列表 */}
-            <div className="tech-panel p-4 space-y-3 max-h-[calc(100vh-280px)] overflow-y-auto">
-              {searchQuery ? (
-                <div className="grid grid-cols-3 gap-2">
-                  {filteredUnits.map(unit => {
-                    const isSelected = selectedUnits.some(u => u.id === unit.id);
-                    const category = unitCategories.find(c => c.id === unit.category);
-                    return (
-                      <button
-                        key={unit.id}
-                        onClick={() => selectUnit(unit)}
-                        className={`unit-card p-3 text-left ${isSelected ? 'selected' : ''}`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span
-                            className="category-tag"
-                            style={{
-                              background: `${category?.color}20`,
-                              color: category?.color,
-                            }}
-                          >
-                            {unit.s}
-                          </span>
-                          {isSelected && (
-                            <span className="text-[#00e5ff] text-xs">✓</span>
-                          )}
-                        </div>
-                        <div className="font-bold text-sm">{lang === 'zh' ? unit.cn : unit.en}</div>
-                        <div className="text-xs text-[#7a7a8c]">{lang === 'zh' ? unit.en : unit.cn}</div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                unitCategories.map(category => {
-                  const categoryUnits = unitsByCategory[category.id] || [];
-                  const isExpanded = expandedCategories.has(category.id);
-                  
-                  return (
-                    <div key={category.id} className="border border-[#2a2a35] rounded-lg overflow-hidden">
-                      <button
-                        onClick={() => toggleCategory(category.id)}
-                        className="w-full flex items-center justify-between p-3 bg-[#1a1a22] hover:bg-[#22222a] transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="w-2 h-2 rounded-full"
-                            style={{ background: category.color }}
-                          />
-                          <span className="font-bold">{getCategoryName(category.id)}</span>
-                          <span className="text-xs text-[#7a7a8c]">({categoryUnits.length})</span>
-                        </div>
-                        {isExpanded ? (
-                          <ChevronUp className="w-4 h-4 text-[#7a7a8c]" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4 text-[#7a7a8c]" />
-                        )}
-                      </button>
-                      
-                      {isExpanded && (
-                        <div className="p-2 grid grid-cols-3 gap-2">
-                          {categoryUnits.map(unit => {
-                            const isSelected = selectedUnits.some(u => u.id === unit.id);
-                            return (
-                              <button
-                                key={unit.id}
-                                onClick={() => selectUnit(unit)}
-                                className={`unit-card p-2 text-left ${isSelected ? 'selected' : ''}`}
-                              >
-                                <div className="flex items-center justify-between mb-1">
-                                  <span
-                                    className="text-xs font-bold px-1.5 py-0.5 rounded"
-                                    style={{
-                                      background: `${category.color}20`,
-                                      color: category.color,
-                                    }}
-                                  >
-                                    {unit.s}
-                                  </span>
-                                  {isSelected && (
-                                    <span className="text-[#00e5ff] text-xs">✓</span>
-                                  )}
-                                </div>
-                                <div className="font-bold text-sm truncate">{lang === 'zh' ? unit.cn : unit.en}</div>
-                                <div className="text-xs text-[#7a7a8c] truncate">{lang === 'zh' ? unit.en : unit.cn}</div>
-                              </button>
-                            );
-                          })}
-                        </div>
+            <div className="tech-panel p-4 space-y-3 max-h-[calc(100vh-220px)] overflow-y-auto">
+              {unitCategories.map(category => {
+                const categoryUnits = unitsByCategory[category.id] || [];
+                const isExpanded = expandedCategories.has(category.id);
+                
+                return (
+                  <div key={category.id} className="border border-[#2a2a35] rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory(category.id)}
+                      className="w-full flex items-center justify-between p-3 bg-[#1a1a22] hover:bg-[#22222a] transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="w-2 h-2 rounded-full"
+                          style={{ background: category.color }}
+                        />
+                        <span className="font-bold">{getCategoryName(category.id)}</span>
+                        <span className="text-xs text-[#7a7a8c]">({categoryUnits.length})</span>
+                      </div>
+                      {isExpanded ? (
+                        <ChevronUp className="w-4 h-4 text-[#7a7a8c]" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-[#7a7a8c]" />
                       )}
-                    </div>
-                  );
-                })
-              )}
+                    </button>
+                    
+                    {isExpanded && (
+                      <div className="p-2 grid grid-cols-3 gap-2">
+                        {categoryUnits.map(unit => {
+                          const isSelected = selectedUnits.some(u => u.id === unit.id);
+                          return (
+                            <button
+                              key={unit.id}
+                              onClick={() => selectUnit(unit)}
+                              className={`unit-card p-2 text-left ${isSelected ? 'selected' : ''}`}
+                            >
+                              <div className="flex items-center justify-between mb-1">
+                                <span
+                                  className="text-xs font-bold px-1.5 py-0.5 rounded"
+                                  style={{
+                                    background: `${category.color}20`,
+                                    color: category.color,
+                                  }}
+                                >
+                                  {unit.s}
+                                </span>
+                                {isSelected && (
+                                  <span className="text-[#00e5ff] text-xs">✓</span>
+                                )}
+                              </div>
+                              <div className="font-bold text-sm truncate">{lang === 'zh' ? unit.cn : unit.en}</div>
+                              <div className="text-xs text-[#7a7a8c] truncate">{lang === 'zh' ? unit.en : unit.cn}</div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           {/* 右侧：已选单位展示 */}
           <div>
-            {/* 预览区域（用于显示） */}
-            <div ref={resultRef} className="tech-panel p-6">
+            {/* 预览区域 */}
+            <div className="tech-panel p-6">
               {/* 标题区域 */}
               <div className="text-center mb-6 pb-6 border-b border-[#2c2c36]">
-                <h2 className="text-2xl font-black text-white mb-2">
-                  {t.title}<span className="text-[#00e5ff]">9</span>{t.titleSuffix}
+                <h2 className="text-2xl font-black text-white">
+                  {t.title}
                 </h2>
-                <p className="text-sm text-[#7a7a8c]">
-                  {lang === 'zh' ? '钢铁指挥官 / Mechabellum' : 'Mechabellum'}
+                <p className="text-sm text-[#7a7a8c] mt-2">
+                  {t.author}
                 </p>
               </div>
 
@@ -524,7 +478,7 @@ function App() {
                             <X className="w-3 h-3" />
                           </button>
                           
-                          {/* 备注按钮 - 更明显 */}
+                          {/* 备注按钮 */}
                           <button
                             onClick={(e) => openComment(unit, e)}
                             className={`absolute top-1 left-1 w-6 h-6 rounded-full flex items-center justify-center text-xs z-20 transition-all ${
@@ -537,36 +491,36 @@ function App() {
                             {unit.comment ? '✎' : <MessageSquarePlus className="w-3.5 h-3.5" />}
                           </button>
                           
-                          {/* 单位图标背景 */}
+                          {/* 单位图标 - 使用img标签 */}
                           {unit.icon && (
-                            <div 
-                              className="absolute inset-0 z-0 flex items-center justify-center"
-                              style={{
-                                background: `url(${unit.icon})`,
-                                backgroundSize: 'contain',
-                                backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'center',
-                                opacity: 0.7,
-                                transform: 'scale(0.85)',
+                            <img 
+                              src={unit.icon}
+                              alt={unit.cn}
+                              className="absolute inset-0 w-full h-full object-contain opacity-50 z-0 p-2"
+                              style={{ transform: 'scale(0.85)' }}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
                               }}
                             />
                           )}
                           
                           {/* 单位信息 */}
-                          <div
-                            className="text-2xl font-black mb-1 relative z-10"
-                            style={{
-                              color: unitCategories.find(c => c.id === unit.category)?.color,
-                              textShadow: '0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9)',
-                            }}
-                          >
-                            {unit.s}
-                          </div>
-                          <div className="font-bold text-white text-center px-1 relative z-10 text-sm" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
-                            {lang === 'zh' ? unit.cn : unit.en}
-                          </div>
-                          <div className="text-xs text-[#a0a0b0] text-center px-1 relative z-10" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>
-                            {lang === 'zh' ? unit.en : unit.cn}
+                          <div className="relative z-10 flex flex-col items-center">
+                            <div
+                              className="text-2xl font-black mb-1"
+                              style={{
+                                color: unitCategories.find(c => c.id === unit.category)?.color,
+                                textShadow: '0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9)',
+                              }}
+                            >
+                              {unit.s}
+                            </div>
+                            <div className="font-bold text-white text-center px-1 text-sm" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
+                              {lang === 'zh' ? unit.cn : unit.en}
+                            </div>
+                            <div className="text-xs text-[#a0a0b0] text-center px-1" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>
+                              {lang === 'zh' ? unit.en : unit.cn}
+                            </div>
                           </div>
                           
                           {/* 备注显示 */}
@@ -597,20 +551,16 @@ function App() {
 
             {/* 导出用隐藏区域 */}
             <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-              <div ref={exportRef} className="tech-panel p-8" style={{ width: '650px', background: '#16161d' }}>
+              <div ref={exportRef} className="tech-panel p-8" style={{ width: '600px', background: '#16161d' }}>
                 {/* 标题区域 */}
                 <div className="text-center mb-6 pb-6 border-b border-[#2c2c36]">
-                  <h2 className="text-3xl font-black text-white mb-2">
+                  <h2 className="text-3xl font-black text-white">
                     {nickname 
-                      ? (lang === 'zh' ? `${nickname}的最心爱的` : `${name}'s 9 Favorite`)
-                      : (lang === 'zh' ? '我最心爱的' : 'My 9 Favorite')
+                      ? (lang === 'zh' ? `${nickname}的最心爱的9个钢指单位` : `${nickname}'s 9 Favorite Mechabellum Units`)
+                      : (lang === 'zh' ? '我最心爱的9个钢指单位' : 'My 9 Favorite Mechabellum Units')
                     }
-                    <span style={{ color: '#00e5ff' }}>9</span>
-                    {lang === 'zh' ? '钢指单位' : ' Mecha Units'}
                   </h2>
-                  <p className="text-base text-[#7a7a8c]">
-                    {lang === 'zh' ? '钢铁指挥官 / Mechabellum' : 'Mechabellum'}
-                  </p>
+                  <p className="text-base text-[#7a7a8c] mt-2">{t.author}</p>
                 </div>
 
                 {/* 9宫格 */}
@@ -625,38 +575,35 @@ function App() {
                             ? 'border-[#00e5ff] bg-[#0a1620]'
                             : 'border-dashed border-[#2c2c36] bg-[#121217]'
                         }`}
-                        style={{ height: '160px', width: '190px' }}
+                        style={{ height: '150px', width: '180px' }}
                       >
                         {unit ? (
                           <>
-                            {/* 单位图标背景 */}
+                            {/* 单位图标 */}
                             {unit.icon && (
-                              <div 
-                                className="absolute inset-0 z-0 flex items-center justify-center"
-                                style={{
-                                  background: `url(${baseUrl}${unit.icon})`,
-                                  backgroundSize: 'contain',
-                                  backgroundRepeat: 'no-repeat',
-                                  backgroundPosition: 'center',
-                                  opacity: 0.8,
-                                  transform: 'scale(0.8)',
-                                }}
+                              <img 
+                                src={`${baseUrl}${unit.icon}`}
+                                alt={unit.cn}
+                                className="absolute inset-0 w-full h-full object-contain opacity-60 z-0 p-2"
+                                crossOrigin="anonymous"
                               />
                             )}
-                            <div
-                              className="text-4xl font-black mb-2 relative z-10"
-                              style={{
-                                color: unitCategories.find(c => c.id === unit.category)?.color,
-                                textShadow: '0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9)',
-                              }}
-                            >
-                              {unit.s}
-                            </div>
-                            <div className="font-bold text-white text-lg text-center px-2 relative z-10" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
-                              {lang === 'zh' ? unit.cn : unit.en}
-                            </div>
-                            <div className="text-xs text-[#a0a0b0] text-center px-2 relative z-10" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>
-                              {lang === 'zh' ? unit.en : unit.cn}
+                            <div className="relative z-10 flex flex-col items-center">
+                              <div
+                                className="text-4xl font-black mb-1"
+                                style={{
+                                  color: unitCategories.find(c => c.id === unit.category)?.color,
+                                  textShadow: '0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9)',
+                                }}
+                              >
+                                {unit.s}
+                              </div>
+                              <div className="font-bold text-white text-base text-center px-2" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
+                                {lang === 'zh' ? unit.cn : unit.en}
+                              </div>
+                              <div className="text-xs text-[#a0a0b0] text-center px-2" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>
+                                {lang === 'zh' ? unit.en : unit.cn}
+                              </div>
                             </div>
                             {unit.comment && (
                               <div className="absolute bottom-0 left-0 right-0 bg-[#00e5ff]/40 px-2 py-1 z-10">
@@ -674,43 +621,24 @@ function App() {
                   })}
                 </div>
 
-                {/* 底部信息区域 */}
+                {/* 简化底部信息 - 只保留网页二维码和链接 */}
                 <div className="mt-8 pt-6 border-t border-[#2c2c36]">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-center gap-6">
                     {/* 左侧二维码 */}
-                    <div className="text-center">
+                    <div className="text-center flex-shrink-0">
                       <img 
                         src={`${baseUrl}/qr_codes/website.png`}
                         alt="QR" 
-                        style={{ width: '100px', height: '100px', borderRadius: '8px' }}
+                        style={{ width: '80px', height: '80px', borderRadius: '8px' }}
+                        crossOrigin="anonymous"
                       />
-                      <p className="text-xs text-[#7a7a8c] mt-2">{t.scanToVisit}</p>
+                      <p className="text-xs text-[#7a7a8c] mt-1">{t.scanToVisit}</p>
                     </div>
                     
                     {/* 中间链接 */}
-                    <div className="flex-1 px-6">
-                      <p className="text-base text-white mb-2">https://maxalphalinker.github.io/mechabellum-my9</p>
-                      <p className="text-sm text-[#7a7a8c]">{t.generatedBy}</p>
-                    </div>
-
-                    {/* 右侧社区二维码 */}
-                    <div className="flex gap-3">
-                      <div className="text-center">
-                        <img 
-                          src={`${baseUrl}/qr_codes/qq_channel.png`}
-                          alt="QQ" 
-                          style={{ width: '80px', height: '80px', borderRadius: '6px' }}
-                        />
-                        <p className="text-xs text-[#7a7a8c] mt-1">QQ</p>
-                      </div>
-                      <div className="text-center">
-                        <img 
-                          src={`${baseUrl}/qr_codes/xiaoheihe.png`}
-                          alt="Xiaoheihe" 
-                          style={{ width: '80px', height: '80px', borderRadius: '6px' }}
-                        />
-                        <p className="text-xs text-[#7a7a8c] mt-1">{lang === 'zh' ? '小黑盒' : 'XHH'}</p>
-                      </div>
+                    <div className="text-center">
+                      <p className="text-base text-white mb-1">maxalphalinker.github.io/mechabellum-my9</p>
+                      <p className="text-sm text-[#7a7a8c]">{t.author}</p>
                     </div>
                   </div>
                 </div>
@@ -819,13 +747,14 @@ function App() {
         </DialogContent>
       </Dialog>
 
-      {/* 昵称输入对话框 */}
-      <Dialog open={nicknameDialogOpen} onOpenChange={setNicknameDialogOpen}>
-        <DialogContent className="bg-[#16161d] border-[#2c2c36] text-white max-w-sm">
+      {/* 导出/预览对话框 */}
+      <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+        <DialogContent className="bg-[#16161d] border-[#2c2c36] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold">{t.export}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
+            {/* 昵称输入 */}
             <div>
               <label className="text-sm text-[#7a7a8c] mb-2 block">{t.nickname}</label>
               <input
@@ -837,10 +766,23 @@ function App() {
                 maxLength={20}
               />
             </div>
+            
+            {/* 预览图 */}
+            {previewImage && (
+              <div className="bg-[#0c0c10] p-4 rounded-lg">
+                <p className="text-sm text-[#7a7a8c] mb-2">{t.preview}</p>
+                <img 
+                  src={previewImage} 
+                  alt="Preview" 
+                  className="w-full rounded-lg border border-[#2c2c36]"
+                />
+              </div>
+            )}
+            
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => setNicknameDialogOpen(false)}
+                onClick={() => setExportDialogOpen(false)}
                 className="flex-1 border-[#444] bg-transparent hover:bg-[#23232c]"
               >
                 {t.cancel}
