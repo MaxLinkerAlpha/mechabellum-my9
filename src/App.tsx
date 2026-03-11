@@ -668,7 +668,7 @@ function App() {
                     </div>
                     {/* 文字信息 */}
                     <div className="text-left">
-                      <p className="text-base text-white mb-1">maxalphalinker.github.io/mechabellum-my9fav</p>
+                      <p className="text-base text-white mb-1">github.com/MaxLinkerAlpha/mechabellum-my9</p>
                       <p className="text-sm text-[#7a7a8c]">{lang === 'zh' ? '扫码或输入网址，制作你的钢指Top9' : 'Scan or enter URL to create your Mecha Top9'}</p>
                     </div>
                   </div>
