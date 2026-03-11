@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Unit } from './data/units';
 import { units as allUnits, unitCategories } from './data/units';
-import { X, Download, Share2, RotateCcw, ChevronDown, ChevronUp, ExternalLink, Globe, MessageSquarePlus, Eye } from 'lucide-react';
+import { X, Download, Share2, RotateCcw, ChevronDown, ChevronUp, ExternalLink, Globe, MessageSquarePlus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -525,9 +525,9 @@ function App() {
                           
                           {/* 备注显示 */}
                           {unit.comment && (
-                            <div className="absolute bottom-0 left-0 right-0 bg-[#00e5ff]/40 px-1 py-0.5 z-10">
-                              <p className="text-[10px] text-white text-center truncate font-bold" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>
-                                {unit.comment}
+                            <div className="absolute bottom-2 left-2 right-2 bg-[#16161d]/90 border border-[#00e5ff]/50 rounded px-1.5 py-1 z-10">
+                              <p className="text-[10px] text-[#00e5ff] text-center font-medium leading-tight" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>
+                                "{unit.comment}"
                               </p>
                             </div>
                           )}
@@ -575,7 +575,7 @@ function App() {
                             ? 'border-[#00e5ff] bg-[#0a1620]'
                             : 'border-dashed border-[#2c2c36] bg-[#121217]'
                         }`}
-                        style={{ height: '150px', width: '180px' }}
+                        style={{ height: unit?.comment ? '180px' : '150px', width: '180px' }}
                       >
                         {unit ? (
                           <>
@@ -584,13 +584,14 @@ function App() {
                               <img 
                                 src={`${baseUrl}${unit.icon}`}
                                 alt={unit.cn}
-                                className="absolute inset-0 w-full h-full object-contain opacity-60 z-0 p-2"
+                                className="absolute inset-0 w-full h-full object-contain opacity-50 z-0 p-2"
+                                style={{ top: unit.comment ? '0' : '10px' }}
                                 crossOrigin="anonymous"
                               />
                             )}
-                            <div className="relative z-10 flex flex-col items-center">
+                            <div className="relative z-10 flex flex-col items-center" style={{ marginTop: unit.comment ? '-10px' : '0' }}>
                               <div
-                                className="text-4xl font-black mb-1"
+                                className="text-3xl font-black mb-1"
                                 style={{
                                   color: unitCategories.find(c => c.id === unit.category)?.color,
                                   textShadow: '0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9)',
@@ -598,17 +599,17 @@ function App() {
                               >
                                 {unit.s}
                               </div>
-                              <div className="font-bold text-white text-base text-center px-2" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
+                              <div className="font-bold text-white text-base text-center px-1" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
                                 {lang === 'zh' ? unit.cn : unit.en}
                               </div>
-                              <div className="text-xs text-[#a0a0b0] text-center px-2" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>
+                              <div className="text-xs text-[#a0a0b0] text-center px-1" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>
                                 {lang === 'zh' ? unit.en : unit.cn}
                               </div>
                             </div>
                             {unit.comment && (
-                              <div className="absolute bottom-0 left-0 right-0 bg-[#00e5ff]/40 px-2 py-1 z-10">
-                                <p className="text-xs text-white text-center truncate font-bold" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>
-                                  {unit.comment}
+                              <div className="absolute bottom-2 left-2 right-2 bg-[#16161d]/90 border border-[#00e5ff]/50 rounded px-2 py-1.5 z-10">
+                                <p className="text-[11px] text-[#00e5ff] text-center font-medium leading-tight" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>
+                                  "{unit.comment}"
                                 </p>
                               </div>
                             )}
