@@ -284,6 +284,12 @@ function App() {
               </h1>
               <div className="flex items-center gap-3 mt-1">
                 <p className="text-sm text-[#7a7a8c]">{t.subtitle}</p>
+                {/* Visitors 统计 */}
+                <img 
+                  src="https://visitor-badge.glitch.me/badge?page_id=maxlinkeralpha.mechabellum-my9"
+                  alt="visitors"
+                  className="h-5"
+                />
                 {githubStars !== null && (
                   <a
                     href="https://github.com/MaxLinkerAlpha/mechabellum-my9"
@@ -300,9 +306,9 @@ function App() {
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              {/* 社区链接 */}
-              <div className="flex items-center gap-1.5 mr-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* 社区链接 - 手机端隐藏 */}
+              <div className="hidden sm:flex items-center gap-1.5 mr-2">
                 <a
                   href="https://store.steampowered.com/app/669330/"
                   target="_blank"
@@ -341,9 +347,9 @@ function App() {
                 </a>
               </div>
               
-              <div className="w-px h-6 bg-[#2c2c36]" />
+              <div className="hidden sm:block w-px h-6 bg-[#2c2c36]" />
               
-              <div className="flex gap-2">
+              <div className="flex gap-1.5 sm:gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -402,8 +408,8 @@ function App() {
             </div>
 
             {/* 单位列表 - 平铺显示 */}
-            <div className="tech-panel p-4 max-h-[calc(100vh-220px)] overflow-y-auto">
-              <div className="grid grid-cols-4 gap-3">
+            <div className="tech-panel p-3 sm:p-4 max-h-[calc(100vh-220px)] overflow-y-auto">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
                 {allUnits.map(unit => {
                   const isSelected = selectedUnits.some(u => u.id === unit.id);
                   return (
