@@ -305,9 +305,6 @@ function App() {
     return t.heavyUnits;
   };
 
-  // 获取当前域名
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-
   return (
     <div className="min-h-screen bg-[#0c0c10] text-[#f0f0f0]">
       {/* 头部 */}
@@ -412,24 +409,36 @@ function App() {
                             <button
                               key={unit.id}
                               onClick={() => selectUnit(unit)}
-                              className={`unit-card p-2 text-left ${isSelected ? 'selected' : ''}`}
+                              className={`unit-card p-2 text-left relative overflow-hidden ${isSelected ? 'selected' : ''}`}
+                              style={{ minHeight: '80px' }}
                             >
-                              <div className="flex items-center justify-between mb-1">
-                                <span
-                                  className="text-xs font-bold px-1.5 py-0.5 rounded"
-                                  style={{
-                                    background: `${category.color}20`,
-                                    color: category.color,
+                              {/* 单位图标 */}
+                              {unit.icon && (
+                                <img 
+                                  src={unit.icon}
+                                  alt={unit.cn}
+                                  className="absolute inset-0 w-full h-full object-contain z-0"
+                                  style={{ 
+                                    opacity: isSelected ? 0.4 : 0.7,
+                                    transform: 'scale(0.9)',
                                   }}
-                                >
-                                  {unit.s}
-                                </span>
-                                {isSelected && (
-                                  <span className="text-[#00e5ff] text-xs">✓</span>
-                                )}
+                                  onError={(e) => {
+                                    console.log('Icon load failed:', unit.icon);
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                              )}
+                              
+                              {/* 选择标记 */}
+                              {isSelected && (
+                                <span className="absolute top-1 right-1 text-[#00e5ff] text-xs z-10">✓</span>
+                              )}
+                              
+                              {/* 单位名称 */}
+                              <div className="relative z-10 mt-auto">
+                                <div className="font-bold text-sm truncate text-white" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>{lang === 'zh' ? unit.cn : unit.en}</div>
+                                <div className="text-xs text-[#a0a0b0] truncate" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>{lang === 'zh' ? unit.en : unit.cn}</div>
                               </div>
-                              <div className="font-bold text-sm truncate">{lang === 'zh' ? unit.cn : unit.en}</div>
-                              <div className="text-xs text-[#7a7a8c] truncate">{lang === 'zh' ? unit.en : unit.cn}</div>
                             </button>
                           );
                         })}
@@ -575,7 +584,7 @@ function App() {
                             {/* 单位图标 */}
                             {unit.icon && (
                               <img 
-                                src={`${baseUrl}${unit.icon}`}
+                                src={unit.icon}
                                 alt={unit.cn}
                                 className="absolute inset-0 w-full h-full object-contain z-0"
                                 style={{ 
@@ -614,7 +623,7 @@ function App() {
                     {/* 二维码 */}
                     <div className="flex flex-col items-center">
                       <img 
-                        src={`${baseUrl}/qr_codes/website.png`}
+                        src="./qr_codes/website.png"
                         alt="QR Code"
                         className="w-20 h-20 rounded-lg border border-[#2c2c36]"
                         crossOrigin="anonymous"
