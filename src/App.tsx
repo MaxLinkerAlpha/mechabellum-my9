@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Unit } from './data/units';
 import { units as allUnits, unitCategories } from './data/units';
-import { X, Download, Share2, RotateCcw, Globe, MessageSquarePlus } from 'lucide-react';
+import { X, Download, Share2, RotateCcw, Globe, MessageSquarePlus, Copy } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -33,7 +33,9 @@ const translations = {
     commentPlaceholder: '输入你对这个单位的评价...',
     cancel: '取消',
     save: '保存',
-    generateImage: '生成图片',
+    generateImage: '下载图片',
+    copyImage: '复制图片',
+    copyImageTip: '可直接粘贴到QQ/微信/Discord',
     nickname: '输入你的昵称（可选）',
     nicknamePlaceholder: '例如：钢铁指挥官',
     shareTitle: '分享你的选择',
@@ -65,7 +67,9 @@ const translations = {
     commentPlaceholder: 'Enter your thoughts on this unit...',
     cancel: 'Cancel',
     save: 'Save',
-    generateImage: 'Generate Image',
+    generateImage: 'Download Image',
+    copyImage: 'Copy Image',
+    copyImageTip: 'Paste to QQ/WeChat/Discord directly',
     nickname: 'Enter your nickname (optional)',
     nicknamePlaceholder: 'e.g., MechaCommander',
     shareTitle: 'Share Your Selection',
@@ -175,9 +179,9 @@ function App() {
     }, 100);
   }, [selectedUnits.length, t]);
 
-  // 导出图片
-  const exportImage = useCallback(async () => {
-    if (!exportRef.current) return;
+  // 生成 canvas
+  const generateCanvas = useCallback(async () => {
+    if (!exportRef.current) return null;
     
     try {
       toast.info(lang === 'zh' ? '正在生成...' : 'Generating...');
@@ -188,22 +192,59 @@ function App() {
         allowTaint: true,
         logging: false,
       });
-      
-      const link = document.createElement('a');
-      const name = nickname || (lang === 'zh' ? '玩家' : 'Player');
-      link.download = lang === 'zh' 
-        ? `${name}的最心爱的9个钢指单位.png`
-        : `${name}_9_Favorite_Units.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      
-      toast.success(lang === 'zh' ? '图片已保存' : 'Image saved');
-      setExportDialogOpen(false);
+      return canvas;
     } catch (error) {
       console.error('Export error:', error);
       toast.error(lang === 'zh' ? '生成图片失败' : 'Failed to generate image');
+      return null;
     }
-  }, [nickname, lang, t]);
+  }, [lang]);
+
+  // 导出图片（下载）
+  const exportImage = useCallback(async () => {
+    const canvas = await generateCanvas();
+    if (!canvas) return;
+    
+    const link = document.createElement('a');
+    const name = nickname || (lang === 'zh' ? '玩家' : 'Player');
+    link.download = lang === 'zh' 
+      ? `${name}的最心爱的9个钢指单位.png`
+      : `${name}_9_Favorite_Units.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    toast.success(lang === 'zh' ? '图片已保存' : 'Image saved');
+    setExportDialogOpen(false);
+  }, [nickname, lang, t, generateCanvas]);
+
+  // 复制图片到剪贴板
+  const copyImageToClipboard = useCallback(async () => {
+    const canvas = await generateCanvas();
+    if (!canvas) return;
+    
+    try {
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          toast.error(lang === 'zh' ? '复制失败' : 'Copy failed');
+          return;
+        }
+        
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          toast.success(lang === 'zh' ? '图片已复制到剪贴板' : 'Image copied to clipboard');
+          setExportDialogOpen(false);
+        } catch (err) {
+          console.error('Copy error:', err);
+          toast.error(lang === 'zh' ? '复制失败，请使用下载按钮' : 'Copy failed, please use download button');
+        }
+      }, 'image/png');
+    } catch (error) {
+      console.error('Copy error:', error);
+      toast.error(lang === 'zh' ? '复制失败' : 'Copy failed');
+    }
+  }, [lang, generateCanvas]);
 
   // 打开分享对话框
   const openShareDialog = useCallback(() => {
@@ -725,20 +766,34 @@ function App() {
               </div>
             )}
             
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setExportDialogOpen(false)}
-                className="flex-1 border-[#444] bg-transparent hover:bg-[#23232c]"
-              >
-                {t.cancel}
-              </Button>
-              <Button
-                onClick={exportImage}
-                className="flex-1 bg-[#00e5ff] text-black hover:bg-[#00c8dd] font-bold"
-              >
-                {t.generateImage}
-              </Button>
+            {/* 操作按钮 */}
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setExportDialogOpen(false)}
+                  className="flex-1 border-[#444] bg-transparent hover:bg-[#23232c]"
+                >
+                  {t.cancel}
+                </Button>
+                <Button
+                  onClick={copyImageToClipboard}
+                  variant="outline"
+                  className="flex-1 border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10"
+                >
+                  <Copy className="w-4 h-4 mr-1" />
+                  {t.copyImage}
+                </Button>
+                <Button
+                  onClick={exportImage}
+                  className="flex-1 bg-[#00e5ff] text-black hover:bg-[#00c8dd] font-bold"
+                >
+                  {t.generateImage}
+                </Button>
+              </div>
+              <p className="text-xs text-[#7a7a8c] text-center">
+                💡 {t.copyImageTip}
+              </p>
             </div>
           </div>
         </DialogContent>
