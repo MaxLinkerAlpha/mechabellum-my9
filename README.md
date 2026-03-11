@@ -6,7 +6,7 @@
 
 ## 在线体验
 
-[点击访问](https://maxlinkeralpha.github.io/mechabellum-my9fav)
+[点击访问](https://maxlinkeralpha.github.io/mechabellum-my9)
 
 ## 功能特性
 
@@ -55,7 +55,7 @@ public/
   id: '32',
   cn: '新单位中文名',
   en: 'New Unit Name', 
-  s: '缩',
+  s: '缩', //存疑，我记得让AI删除过
   icon: './unit_icon/xxx.png'
 }
 ```
