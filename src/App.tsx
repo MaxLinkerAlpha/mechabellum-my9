@@ -14,9 +14,9 @@ interface SelectedUnit extends Unit {
 // 社区链接配置
 const communityLinks = [
   { name: 'Steam商店', url: 'https://store.steampowered.com/app/669330/', icon: '🎮' },
-  { name: 'QQ交流群', url: 'https://qm.qq.com/q/226025841', icon: '💬' },
-  { name: 'QQ频道', url: 'https://pd.qq.com/g/pd90070872', icon: '📢' },
-  { name: '小黑盒', url: 'https://api.xiaoheihe.cn/s/10019c', icon: '📦' },
+  { name: 'QQ交流群', url: 'https://qm.qq.com/q/226025841', icon: '💬', qrCode: '/qr_codes/qq_channel.png' },
+  { name: 'QQ频道', url: 'https://pd.qq.com/g/pd90070872', icon: '📢', qrCode: '/qr_codes/qq_channel.png' },
+  { name: '小黑盒', url: 'https://api.xiaoheihe.cn/s/10019c', icon: '📦', qrCode: '/qr_codes/xiaoheihe.png' },
 ];
 
 function App() {
@@ -94,7 +94,7 @@ function App() {
     return base64;
   }, [selectedUnits]);
 
-  // 导出图片（带社区链接）
+  // 导出图片（带社区链接和二维码）
   const exportImage = useCallback(async () => {
     if (!exportRef.current) return;
     
@@ -105,10 +105,11 @@ function App() {
         scale: 2,
         useCORS: true,
         allowTaint: true,
+        logging: false,
       });
       
       const link = document.createElement('a');
-      link.download = `我的九个钢指单位_${Date.now()}.png`;
+      link.download = `我最心爱的9个钢指单位_${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
       
@@ -194,10 +195,10 @@ function App() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-black tracking-tight text-white">
-                构成我的<span className="text-[#00e5ff]">九个</span>钢指单位
+                我最心爱的<span className="text-[#00e5ff]">9个</span>钢指单位
               </h1>
               <p className="text-sm text-[#7a7a8c] mt-1">
-                选择构成你的钢铁指挥官战术风格的9个单位
+                选择你最心爱的9个钢铁指挥官单位
               </p>
             </div>
             <div className="flex gap-2">
@@ -364,7 +365,7 @@ function App() {
               {/* 标题区域 */}
               <div className="text-center mb-6 pb-6 border-b border-[#2c2c36]">
                 <h2 className="text-2xl font-black text-white mb-2">
-                  构成我的<span className="text-[#00e5ff]">九个</span>钢指单位
+                  我最心爱的<span className="text-[#00e5ff]">9个</span>钢指单位
                 </h2>
                 <p className="text-sm text-[#7a7a8c]">
                   钢铁指挥官 / Mechabellum
@@ -398,19 +399,31 @@ function App() {
                           >
                             {unit.comment ? '✎' : '+'}
                           </button>
+                          {/* 背景图标 */}
+                          {unit.icon && (
+                            <div 
+                              className="absolute inset-0 opacity-30"
+                              style={{
+                                backgroundImage: `url(${unit.icon})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                              }}
+                            />
+                          )}
                           <div
-                            className="text-3xl font-black mb-1"
+                            className="text-3xl font-black mb-1 relative z-10 drop-shadow-lg"
                             style={{
                               color: unitCategories.find(c => c.id === unit.category)?.color,
+                              textShadow: '0 0 10px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.9)',
                             }}
                           >
                             {unit.s}
                           </div>
-                          <div className="font-bold text-white text-center px-1">{unit.cn}</div>
-                          <div className="text-xs text-[#7a7a8c] text-center px-1">{unit.en}</div>
+                          <div className="font-bold text-white text-center px-1 relative z-10 drop-shadow-lg" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.9)' }}>{unit.cn}</div>
+                          <div className="text-xs text-[#a0a0b0] text-center px-1 relative z-10 drop-shadow-md" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>{unit.en}</div>
                           {unit.comment && (
-                            <div className="absolute bottom-0 left-0 right-0 bg-[#00e5ff]/20 px-1 py-0.5">
-                              <p className="text-[10px] text-[#00e5ff] text-center truncate">
+                            <div className="absolute bottom-0 left-0 right-0 bg-[#00e5ff]/30 px-1 py-0.5 z-10">
+                              <p className="text-[10px] text-white text-center truncate font-bold" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>
                                 {unit.comment}
                               </p>
                             </div>
@@ -433,13 +446,13 @@ function App() {
               </div>
             </div>
 
-            {/* 导出用隐藏区域（带社区链接） */}
+            {/* 导出用隐藏区域（带社区链接和二维码） */}
             <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-              <div ref={exportRef} className="tech-panel p-6" style={{ width: '500px' }}>
+              <div ref={exportRef} className="tech-panel p-6" style={{ width: '600px', background: '#16161d' }}>
                 {/* 标题区域 */}
                 <div className="text-center mb-6 pb-6 border-b border-[#2c2c36]">
                   <h2 className="text-2xl font-black text-white mb-2">
-                    构成我的<span className="text-[#00e5ff]">九个</span>钢指单位
+                    我最心爱的<span className="text-[#00e5ff]">9个</span>钢指单位
                   </h2>
                   <p className="text-sm text-[#7a7a8c]">
                     钢铁指挥官 / Mechabellum
@@ -458,58 +471,103 @@ function App() {
                             ? 'border-[#00e5ff] bg-[#00e5ff]/10'
                             : 'border-dashed border-[#2c2c36] bg-[#121217]'
                         }`}
-                        style={{ height: '130px' }}
+                        style={{ height: '150px', width: '180px' }}
                       >
                         {unit ? (
                           <>
+                            {/* 背景图标 */}
+                            {unit.icon && (
+                              <div 
+                                className="absolute inset-0"
+                                style={{
+                                  backgroundImage: `url(${unit.icon})`,
+                                  backgroundSize: 'cover',
+                                  backgroundPosition: 'center',
+                                  opacity: 0.4,
+                                }}
+                              />
+                            )}
                             <div
-                              className="text-3xl font-black mb-1"
+                              className="text-4xl font-black mb-2 relative z-10"
                               style={{
                                 color: unitCategories.find(c => c.id === unit.category)?.color,
+                                textShadow: '0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9)',
                               }}
                             >
                               {unit.s}
                             </div>
-                            <div className="font-bold text-white text-center px-1">{unit.cn}</div>
-                            <div className="text-xs text-[#7a7a8c] text-center px-1">{unit.en}</div>
+                            <div className="font-bold text-white text-lg text-center px-2 relative z-10" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>{unit.cn}</div>
+                            <div className="text-xs text-[#a0a0b0] text-center px-2 relative z-10" style={{ textShadow: '0 0 6px rgba(0,0,0,0.9)' }}>{unit.en}</div>
                             {unit.comment && (
-                              <div className="absolute bottom-0 left-0 right-0 bg-[#00e5ff]/20 px-1 py-0.5">
-                                <p className="text-[10px] text-[#00e5ff] text-center truncate">
+                              <div className="absolute bottom-0 left-0 right-0 bg-[#00e5ff]/30 px-2 py-1 z-10">
+                                <p className="text-xs text-white text-center truncate font-bold" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>
                                   {unit.comment}
                                 </p>
                               </div>
                             )}
                           </>
                         ) : (
-                          <span className="text-[#444] text-2xl font-bold">{index + 1}</span>
+                          <span className="text-[#444] text-3xl font-bold">{index + 1}</span>
                         )}
                       </div>
                     );
                   })}
                 </div>
 
-                {/* 社区链接区域 */}
+                {/* 网页链接和二维码区域 */}
+                <div className="mt-6 pt-6 border-t border-[#2c2c36]">
+                  <p className="text-center text-sm text-[#7a7a8c] mb-4">访问网页制作你的专属分享图</p>
+                  <div className="flex items-center justify-center gap-6">
+                    <div className="text-center">
+                      <img 
+                        src="/qr_codes/website.png" 
+                        alt="网页二维码" 
+                        style={{ width: '100px', height: '100px', borderRadius: '8px' }}
+                      />
+                      <p className="text-xs text-[#7a7a8c] mt-2">扫码访问</p>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-white mb-1">https://maxalphalinker.github.io/mechabellum-my9</p>
+                      <p className="text-xs text-[#7a7a8c]">我最心爱的9个钢指单位 - 钢铁指挥官玩家分享工具</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 社区链接和二维码区域 */}
                 <div className="mt-6 pt-6 border-t border-[#2c2c36]">
                   <p className="text-center text-sm text-[#7a7a8c] mb-4">加入钢铁指挥官社区</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {communityLinks.map(link => (
-                      <div
-                        key={link.name}
-                        className="flex items-center gap-2 p-3 bg-[#1a1a22] rounded-lg border border-[#2a2a35]"
-                      >
-                        <span className="text-xl">{link.icon}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-white truncate">{link.name}</p>
-                          <p className="text-[10px] text-[#7a7a8c] truncate">{link.url}</p>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="flex items-center justify-center gap-4">
+                    {/* QQ频道二维码 */}
+                    <div className="text-center">
+                      <img 
+                        src="/qr_codes/qq_channel.png" 
+                        alt="QQ频道" 
+                        style={{ width: '90px', height: '90px', borderRadius: '8px' }}
+                      />
+                      <p className="text-xs text-white mt-1">QQ频道</p>
+                    </div>
+                    {/* 小黑盒二维码 */}
+                    <div className="text-center">
+                      <img 
+                        src="/qr_codes/xiaoheihe.png" 
+                        alt="小黑盒" 
+                        style={{ width: '90px', height: '90px', borderRadius: '8px' }}
+                      />
+                      <p className="text-xs text-white mt-1">小黑盒</p>
+                    </div>
+                    {/* 文字链接 */}
+                    <div className="text-left space-y-1">
+                      <p className="text-xs text-[#7a7a8c]">Steam: store.steampowered.com/app/669330/</p>
+                      <p className="text-xs text-[#7a7a8c]">QQ交流群: 226025841</p>
+                      <p className="text-xs text-[#7a7a8c]">QQ频道: pd.qq.com/g/pd90070872</p>
+                      <p className="text-xs text-[#7a7a8c]">小黑盒: api.xiaoheihe.cn/s/10019c</p>
+                    </div>
                   </div>
                 </div>
 
                 {/* 底部信息 */}
-                <div className="text-center text-xs text-[#7a7a8c] mt-6">
-                  <p>使用 构成我的九个钢指单位 生成</p>
+                <div className="text-center text-xs text-[#7a7a8c] mt-6 pt-4 border-t border-[#2c2c36]">
+                  <p>使用 我最心爱的9个钢指单位 生成</p>
                 </div>
               </div>
             </div>
@@ -557,6 +615,57 @@ function App() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* 网页底部社区链接 */}
+        <div className="mt-12 pt-8 border-t border-[#2c2c36]">
+          <h3 className="text-center text-lg font-bold text-white mb-6">加入钢铁指挥官社区</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            {communityLinks.map(link => (
+              <a
+                key={link.name}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center p-4 bg-[#16161d] rounded-lg border border-[#2a2a35] hover:border-[#00e5ff] transition-colors group"
+              >
+                <span className="text-3xl mb-2 group-hover:scale-110 transition-transform">{link.icon}</span>
+                <span className="text-sm text-white font-medium">{link.name}</span>
+              </a>
+            ))}
+          </div>
+          
+          {/* 链接详情 */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3 max-w-3xl mx-auto text-xs text-[#7a7a8c]">
+            <div className="flex items-center gap-2 p-3 bg-[#16161d] rounded-lg">
+              <span className="text-lg">🎮</span>
+              <div>
+                <p className="text-white font-medium">Steam商店</p>
+                <p>store.steampowered.com/app/669330/</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-3 bg-[#16161d] rounded-lg">
+              <span className="text-lg">💬</span>
+              <div>
+                <p className="text-white font-medium">钢铁指挥官交流5群</p>
+                <p>226025841</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-3 bg-[#16161d] rounded-lg">
+              <span className="text-lg">📢</span>
+              <div>
+                <p className="text-white font-medium">钢铁指挥官QQ频道</p>
+                <p>pd.qq.com/g/pd90070872</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-3 bg-[#16161d] rounded-lg">
+              <span className="text-lg">📦</span>
+              <div>
+                <p className="text-white font-medium">游戏河小黑盒官方账号</p>
+                <p>api.xiaoheihe.cn/s/10019c</p>
+              </div>
+            </div>
           </div>
         </div>
       </main>
