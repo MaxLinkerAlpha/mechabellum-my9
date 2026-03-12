@@ -558,16 +558,18 @@ function App() {
                             />
                           )}
                           
-                          {/* 备注显示 - 顶部 */}
+                          {/* 备注显示 - 撑满九宫格 */}
                           {unit.comment && (
-                            <div className="absolute top-6 left-1 right-1 z-10 px-1">
-                              <p className="text-[#00e5ff] text-center font-black leading-tight break-words" style={{ 
-                                textShadow: '0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)',
-                                fontSize: unit.comment.length <= 2 ? '20px' : 
-                                         unit.comment.length <= 5 ? '16px' : 
-                                         unit.comment.length <= 10 ? '14px' : 
-                                         unit.comment.length <= 15 ? '12px' : 
-                                         unit.comment.length <= 20 ? '10px' : '9px'
+                            <div className="absolute inset-2 z-10 flex items-center justify-center">
+                              <p className="text-[#00e5ff] text-center font-black break-words w-full" style={{ 
+                                textShadow: '0 0 8px rgba(0,0,0,1), 0 0 16px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,1)',
+                                fontSize: unit.comment.length <= 2 ? '48px' : 
+                                         unit.comment.length <= 4 ? '40px' : 
+                                         unit.comment.length <= 6 ? '34px' : 
+                                         unit.comment.length <= 10 ? '28px' : 
+                                         unit.comment.length <= 15 ? '22px' : 
+                                         unit.comment.length <= 20 ? '18px' : '15px',
+                                lineHeight: '1.1'
                               }}>
                                 {unit.comment}
                               </p>
@@ -641,16 +643,18 @@ function App() {
                                 crossOrigin="anonymous"
                               />
                             )}
-                            {/* 备注显示 - 顶部 */}
+                            {/* 备注显示 - 撑满九宫格 */}
                             {unit.comment && (
-                              <div className="absolute top-6 left-1 right-1 z-10 px-1">
-                                <p className="text-[#00e5ff] text-center font-black leading-tight break-words" style={{ 
-                                  textShadow: '0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)',
-                                  fontSize: unit.comment.length <= 2 ? '22px' : 
-                                           unit.comment.length <= 5 ? '18px' : 
-                                           unit.comment.length <= 10 ? '16px' : 
-                                           unit.comment.length <= 15 ? '14px' : 
-                                           unit.comment.length <= 20 ? '12px' : '10px'
+                              <div className="absolute inset-3 z-10 flex items-center justify-center">
+                                <p className="text-[#00e5ff] text-center font-black break-words w-full" style={{ 
+                                  textShadow: '0 0 8px rgba(0,0,0,1), 0 0 16px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,1)',
+                                  fontSize: unit.comment.length <= 2 ? '52px' : 
+                                           unit.comment.length <= 4 ? '44px' : 
+                                           unit.comment.length <= 6 ? '38px' : 
+                                           unit.comment.length <= 10 ? '32px' : 
+                                           unit.comment.length <= 15 ? '26px' : 
+                                           unit.comment.length <= 20 ? '20px' : '16px',
+                                  lineHeight: '1.1'
                                 }}>
                                   {unit.comment}
                                 </p>
