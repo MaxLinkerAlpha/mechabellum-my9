@@ -101,6 +101,7 @@ function App() {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>('');
   const exportRef = useRef<HTMLDivElement>(null);
+  const unitListRef = useRef<HTMLDivElement>(null);
 
   // 切换语言
   const toggleLang = useCallback(() => {
@@ -432,7 +433,7 @@ function App() {
       <main className="max-w-6xl mx-auto px-4 py-6">
         <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 gap-6">
           {/* 左侧：单位选择 */}
-          <div className="space-y-4">
+          <div className="space-y-4" ref={unitListRef}>
             {/* 提示 */}
             <div className="bg-[#1a1a22] border border-[#2a2a35] rounded-lg p-3 text-sm text-[#7a7a8c]">
               <p>💡 {lang === 'zh' ? '点击单位添加到右侧，点击已选单位上的' : 'Click units to add, click '}
@@ -529,7 +530,13 @@ function App() {
                           
                           {/* 备注按钮 */}
                           <button
-                            onClick={(e) => openComment(unit, e)}
+                            onClick={(e) => {
+                              openComment(unit, e);
+                              // 手机端自动跳转到单位选择板块
+                              if (window.innerWidth < 1024 && unitListRef.current) {
+                                unitListRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                              }
+                            }}
                             className={`absolute top-1 left-1 w-6 h-6 rounded-full flex items-center justify-center text-xs z-20 transition-all ${
                               unit.comment 
                                 ? 'bg-[#00e5ff] text-black' 
@@ -689,7 +696,7 @@ function App() {
                     </div>
                     {/* 文字信息 */}
                     <div className="text-left">
-                      <p className="text-base text-white mb-1">github.com/MaxLinkerAlpha/mechabellum-my9</p>
+                      <p className="text-base text-white mb-1">maxlinkeralpha.github.io/mechabellum-my9/</p>
                       <p className="text-sm text-[#7a7a8c]">{lang === 'zh' ? '扫码或输入网址，制作你的钢指Top9' : 'Scan or enter URL to create your Mecha Top9'}</p>
                     </div>
                   </div>
