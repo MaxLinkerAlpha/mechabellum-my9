@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Unit } from './data/units';
 import { units as allUnits } from './data/units';
-import { X, Download, Share2, RotateCcw, Globe, MessageSquarePlus, Copy } from 'lucide-react';
+import { X, Download, Share2, RotateCcw, Globe, MessageSquarePlus, Copy, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -591,7 +591,16 @@ function App() {
                           </div>
                         </>
                       ) : (
-                        <span className="text-[#444] text-2xl font-bold">{index + 1}</span>
+                        <button 
+                          onClick={() => {
+                            if (unitListRef.current) {
+                              unitListRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                          }}
+                          className="w-full h-full flex items-center justify-center text-[#444] hover:text-[#00e5ff] transition-colors"
+                        >
+                          <Plus className="w-8 h-8" />
+                        </button>
                       )}
                     </div>
                   );
@@ -675,7 +684,7 @@ function App() {
                             </div>
                           </>
                         ) : (
-                          <span className="text-[#444] text-3xl font-bold">{index + 1}</span>
+                          <span className="text-[#444] text-3xl font-bold">+</span>
                         )}
                       </div>
                     );
