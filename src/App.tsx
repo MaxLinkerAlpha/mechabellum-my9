@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 
 interface SelectedUnit extends Unit {
+  uniqueId: string;
   comment?: string;
 }
 
@@ -106,23 +107,20 @@ function App() {
     setLang(prev => prev === 'zh' ? 'en' : 'zh');
   }, []);
 
-  // 选择单位
+  // 选择单位（允许重复）
   const selectUnit = useCallback((unit: Unit) => {
     setSelectedUnits(prev => {
-      if (prev.find(u => u.id === unit.id)) {
-        return prev.filter(u => u.id !== unit.id);
-      }
       if (prev.length >= 9) {
         toast.error(translations[lang].max9);
         return prev;
       }
-      return [...prev, unit];
+      return [...prev, { ...unit, uniqueId: `${unit.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}` }];
     });
   }, [lang]);
 
-  // 移除单位
-  const removeUnit = useCallback((unitId: string) => {
-    setSelectedUnits(prev => prev.filter(u => u.id !== unitId));
+  // 移除单位（通过uniqueId）
+  const removeUnit = useCallback((uniqueId: string) => {
+    setSelectedUnits(prev => prev.filter(u => u.uniqueId !== uniqueId));
   }, []);
 
   // 打开评论对话框
@@ -287,7 +285,11 @@ function App() {
         for (const d of data) {
           const unit = allUnits.find(u => u.id === d.id);
           if (unit) {
-            loadedUnits.push({ ...unit, comment: d.c });
+            loadedUnits.push({ 
+              ...unit, 
+              uniqueId: `${unit.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              comment: d.c 
+            });
           }
         }
         setSelectedUnits(loadedUnits);
@@ -324,28 +326,28 @@ function App() {
                       href="https://store.steampowered.com/app/669330/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      className="px-2 h-7 flex items-center gap-1 rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
                       title="Steam商店"
                     >
-                      Steam
+                      <span>🎮</span> Steam
                     </a>
                     <a
                       href="https://qm.qq.com/q/226025841"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      className="px-2 h-7 flex items-center gap-1 rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
                       title="QQ群"
                     >
-                      QQ群
+                      <span>💬</span> QQ群
                     </a>
                     <a
                       href="https://pd.qq.com/g/pd90070872"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      className="px-2 h-7 flex items-center gap-1 rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
                       title="QQ频道"
                     >
-                      频道
+                      <span>📢</span> 频道
                     </a>
                   </>
                 ) : (
@@ -354,28 +356,28 @@ function App() {
                       href="https://discord.gg/mechabellum"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      className="px-2 h-7 flex items-center gap-1 rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
                       title="Discord"
                     >
-                      Discord
+                      <span>💬</span> Discord
                     </a>
                     <a
                       href="https://www.reddit.com/r/Mechabellum/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      className="px-2 h-7 flex items-center gap-1 rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
                       title="Reddit"
                     >
-                      Reddit
+                      <span>🔴</span> Reddit
                     </a>
                     <a
                       href="https://steamcommunity.com/app/669330/discussions/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 h-7 flex items-center justify-center rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
+                      className="px-2 h-7 flex items-center gap-1 rounded bg-[#1a1a22] border border-[#2a2a35] hover:border-[#00e5ff] hover:text-[#00e5ff] transition-colors text-xs"
                       title="Steam Discussions"
                     >
-                      Steam
+                      <span>🎮</span> Steam
                     </a>
                   </>
                 )}
@@ -519,7 +521,7 @@ function App() {
                         <>
                           {/* 删除按钮 */}
                           <button
-                            onClick={() => removeUnit(unit.id)}
+                            onClick={() => removeUnit(unit.uniqueId)}
                             className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#ff3d00]/80 hover:bg-[#ff3d00] text-white flex items-center justify-center text-xs z-20"
                           >
                             <X className="w-3 h-3" />
@@ -556,21 +558,24 @@ function App() {
                             />
                           )}
                           
-                          {/* 单位名称 - 悬浮在图标上方 */}
+                          {/* 备注显示 - 顶部 */}
+                          {unit.comment && (
+                            <div className="absolute top-6 left-1 right-1 bg-[#16161d]/90 border border-[#00e5ff]/50 rounded px-1 py-0.5 z-10">
+                              <p className="text-[#00e5ff] text-center font-medium leading-tight" style={{ 
+                                textShadow: '0 0 4px rgba(0,0,0,0.9)',
+                                fontSize: unit.comment.length > 20 ? '8px' : unit.comment.length > 10 ? '9px' : '11px'
+                              }}>
+                                "{unit.comment}"
+                              </p>
+                            </div>
+                          )}
+                          
+                          {/* 单位名称 - 悬浮在底部 */}
                           <div className="absolute bottom-1 left-0 right-0 z-10 flex flex-col items-center bg-gradient-to-t from-black/80 to-transparent pt-4 pb-1">
                             <div className="font-bold text-white text-center px-1 text-sm" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
                               {lang === 'zh' ? unit.cn : unit.en}
                             </div>
                           </div>
-                          
-                          {/* 备注显示 */}
-                          {unit.comment && (
-                            <div className="absolute bottom-2 left-2 right-2 bg-[#16161d]/90 border border-[#00e5ff]/50 rounded px-1.5 py-1 z-10">
-                              <p className="text-[10px] text-[#00e5ff] text-center font-medium leading-tight" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>
-                                "{unit.comment}"
-                              </p>
-                            </div>
-                          )}
                         </>
                       ) : (
                         <span className="text-[#444] text-2xl font-bold">{index + 1}</span>
@@ -632,19 +637,23 @@ function App() {
                                 crossOrigin="anonymous"
                               />
                             )}
+                            {/* 备注显示 - 顶部 */}
+                            {unit.comment && (
+                              <div className="absolute top-6 left-1 right-1 bg-[#16161d]/90 border border-[#00e5ff]/50 rounded px-1 py-0.5 z-10">
+                                <p className="text-[#00e5ff] text-center font-medium leading-tight" style={{ 
+                                  textShadow: '0 0 4px rgba(0,0,0,0.9)',
+                                  fontSize: unit.comment.length > 20 ? '9px' : unit.comment.length > 10 ? '11px' : '13px'
+                                }}>
+                                  "{unit.comment}"
+                                </p>
+                              </div>
+                            )}
                             {/* 单位名称 - 悬浮在底部 */}
                             <div className="absolute bottom-2 left-0 right-0 z-10 flex flex-col items-center bg-gradient-to-t from-black/80 to-transparent pt-4 pb-1">
                               <div className="font-bold text-white text-base text-center px-1" style={{ textShadow: '0 0 8px rgba(0,0,0,0.9)' }}>
                                 {lang === 'zh' ? unit.cn : unit.en}
                               </div>
                             </div>
-                            {unit.comment && (
-                              <div className="absolute bottom-2 left-2 right-2 bg-[#16161d]/90 border border-[#00e5ff]/50 rounded px-2 py-1.5 z-10">
-                                <p className="text-[11px] text-[#00e5ff] text-center font-medium leading-tight" style={{ textShadow: '0 0 4px rgba(0,0,0,0.9)' }}>
-                                  "{unit.comment}"
-                                </p>
-                              </div>
-                            )}
                           </>
                         ) : (
                           <span className="text-[#444] text-3xl font-bold">{index + 1}</span>
