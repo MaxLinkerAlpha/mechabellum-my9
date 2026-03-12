@@ -560,12 +560,16 @@ function App() {
                           
                           {/* 备注显示 - 顶部 */}
                           {unit.comment && (
-                            <div className="absolute top-6 left-1 right-1 bg-[#16161d]/90 border border-[#00e5ff]/50 rounded px-1 py-0.5 z-10">
-                              <p className="text-[#00e5ff] text-center font-medium leading-tight" style={{ 
-                                textShadow: '0 0 4px rgba(0,0,0,0.9)',
-                                fontSize: unit.comment.length > 20 ? '8px' : unit.comment.length > 10 ? '9px' : '11px'
+                            <div className="absolute top-6 left-1 right-1 z-10 px-1">
+                              <p className="text-[#00e5ff] text-center font-black leading-tight break-words" style={{ 
+                                textShadow: '0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)',
+                                fontSize: unit.comment.length <= 2 ? '20px' : 
+                                         unit.comment.length <= 5 ? '16px' : 
+                                         unit.comment.length <= 10 ? '14px' : 
+                                         unit.comment.length <= 15 ? '12px' : 
+                                         unit.comment.length <= 20 ? '10px' : '9px'
                               }}>
-                                "{unit.comment}"
+                                {unit.comment}
                               </p>
                             </div>
                           )}
@@ -639,12 +643,16 @@ function App() {
                             )}
                             {/* 备注显示 - 顶部 */}
                             {unit.comment && (
-                              <div className="absolute top-6 left-1 right-1 bg-[#16161d]/90 border border-[#00e5ff]/50 rounded px-1 py-0.5 z-10">
-                                <p className="text-[#00e5ff] text-center font-medium leading-tight" style={{ 
-                                  textShadow: '0 0 4px rgba(0,0,0,0.9)',
-                                  fontSize: unit.comment.length > 20 ? '9px' : unit.comment.length > 10 ? '11px' : '13px'
+                              <div className="absolute top-6 left-1 right-1 z-10 px-1">
+                                <p className="text-[#00e5ff] text-center font-black leading-tight break-words" style={{ 
+                                  textShadow: '0 0 6px rgba(0,0,0,1), 0 0 12px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)',
+                                  fontSize: unit.comment.length <= 2 ? '22px' : 
+                                           unit.comment.length <= 5 ? '18px' : 
+                                           unit.comment.length <= 10 ? '16px' : 
+                                           unit.comment.length <= 15 ? '14px' : 
+                                           unit.comment.length <= 20 ? '12px' : '10px'
                                 }}>
-                                  "{unit.comment}"
+                                  {unit.comment}
                                 </p>
                               </div>
                             )}
